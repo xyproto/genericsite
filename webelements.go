@@ -213,7 +213,7 @@ func AddTitleBox(tag *Tag, title, subtitle string, cs *ColorScheme) *Tag {
 
 	font1 := a.AddNewTag("div")
 	font1.AddAttr("id", "bluetitle")
-	font1.AddStyle("color", cs.nicecolor)
+	font1.AddStyle("color", cs.Nicecolor)
 	//font1.CustomSansSerif("Armata")
 	font1.SansSerif()
 	font1.AddStyle("font-size", "2.0em")
