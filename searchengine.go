@@ -31,53 +31,53 @@ func searchResults(userSearchText UserInput, pc PageCollection) ([]string, []str
 	var foundWhere []int
 	// TODO: Refactor to get less repetition
 	for _, cp := range pc {
-		if strings.Contains(strings.ToLower(cp.contentTitle), searchText) {
+		if strings.Contains(strings.ToLower(cp.ContentTitle), searchText) {
 			// Check if the url is already in the matches slices
 			found := false
 			for _, url := range matches {
-				if url == cp.url {
+				if url == cp.Url {
 					found = true
 					break
 				}
 			}
 			// If not, add it
 			if !found {
-				matches = append(matches, cp.url)
-				titles = append(titles, cp.contentTitle)
+				matches = append(matches, cp.Url)
+				titles = append(titles, cp.ContentTitle)
 				foundWhere = append(foundWhere, FOUND_IN_TITLE)
 				continue
 			}
 		}
-		if strings.Contains(strings.ToLower(cp.url), searchText) {
+		if strings.Contains(strings.ToLower(cp.Url), searchText) {
 			// Check if the url is already in the matches slices
 			found := false
 			for _, url := range matches {
-				if url == cp.url {
+				if url == cp.Url {
 					found = true
 					break
 				}
 			}
 			// If not, add it
 			if !found {
-				matches = append(matches, cp.url)
-				titles = append(titles, cp.contentTitle)
+				matches = append(matches, cp.Url)
+				titles = append(titles, cp.ContentTitle)
 				foundWhere = append(foundWhere, FOUND_IN_URL)
 				continue
 			}
 		}
-		if strings.Contains(strings.ToLower(cp.contentHTML), searchText) {
+		if strings.Contains(strings.ToLower(cp.ContentHTML), searchText) {
 			// Check if the url is already in the matches slices
 			found := false
 			for _, url := range matches {
-				if url == cp.url {
+				if url == cp.Url {
 					found = true
 					break
 				}
 			}
 			// If not, add it
 			if !found {
-				matches = append(matches, cp.url)
-				titles = append(titles, cp.contentTitle)
+				matches = append(matches, cp.Url)
+				titles = append(titles, cp.ContentTitle)
 				foundWhere = append(foundWhere, FOUND_IN_TEXT)
 				continue
 			}

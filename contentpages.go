@@ -218,7 +218,7 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[s
 	cps = append(cps, *LoginCP(basecp, userState, "/login"))
 	cps = append(cps, *RegisterCP(basecp, userState, "/register"))
 
-	cs := basecp(userState).colorScheme
+	cs := basecp(userState).ColorScheme
 	PublishCPs(cps, cs, tp, "/css/extra.css")
 
 	ServeSearchPages(basecp, userState, cps, cs, tp)
