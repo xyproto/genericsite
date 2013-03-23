@@ -2,10 +2,7 @@ package genericsite
 
 import (
 	"math/rand"
-	"strconv"
 	"strings"
-
-	"github.com/xyproto/browserspeak"
 )
 
 // Converts "true" or "false" to a bool
