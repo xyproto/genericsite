@@ -27,7 +27,7 @@ func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgro
 	div.AddStyle("padding", "0 0 1em 0")
 	div.AddStyle("top", "0")
 	div.AddStyle("left", "0")
-	div.AddStyle("background-color", cs.darkgray)
+	div.AddStyle("background-color", cs.Darkgray)
 	div.AddStyle("position", "fixed")
 	div.AddStyle("display", "block")
 
@@ -39,7 +39,7 @@ func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgro
 	titlebox.AddStyle("height", "3.2em")
 	titlebox.AddStyle("width", "100%")
 	titlebox.AddStyle("position", "fixed")
-	titlebox.AddStyle("background-color", cs.darkgray) // gray, could be a gradient
+	titlebox.AddStyle("background-color", cs.Darkgray) // gray, could be a gradient
 	titlebox.AddStyle("background", "url('"+backgroundTextureURL+"')")
 	//titlebox.AddStyle("z-index", "2") // 2 is above the search box which is 1
 

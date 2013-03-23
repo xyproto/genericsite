@@ -243,17 +243,17 @@ a {
   color: #303030;
   font-weight: regular;
 }
-a:link {color:` + cs.menu_link + `;}
-a:visited {color:` + cs.menu_link + `;}
-a:hover {color:` + cs.menu_hover + `;}
-a:active {color:` + cs.menu_active + `;}
+a:link {color:` + cs.Menu_link + `;}
+a:visited {color:` + cs.Menu_link + `;}
+a:hover {color:` + cs.Menu_hover + `;}
+a:active {color:` + cs.Menu_active + `;}
 `
 		// The load order of background-color, background-size and background-image
 		// is actually significant in Chrome! Do not reorder lightly!
 		if stretchBackground {
-			retval = "body {\nbackground-color: " + cs.default_background + ";\nbackground-size: cover;\n}\n" + retval
+			retval = "body {\nbackground-color: " + cs.Default_background + ";\nbackground-size: cover;\n}\n" + retval
 		} else {
-			retval = "body {\nbackground-color: " + cs.default_background + ";\n}\n" + retval
+			retval = "body {\nbackground-color: " + cs.Default_background + ";\n}\n" + retval
 		}
 		return retval
 	}

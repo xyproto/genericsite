@@ -139,7 +139,7 @@ func GenerateSearchCSS(cs *ColorScheme) SimpleContextHandle {
 		ctx.ContentType("css")
 		return `
 #searchresult {
-	color: ` + cs.nicecolor + `;
+	color: ` + cs.Nicecolor + `;
 	text-decoration: underline;
 }
 `
