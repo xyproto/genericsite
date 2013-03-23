@@ -103,7 +103,7 @@ table, th, tr, td {
 func ServeAdminPages(basecp BaseCP, state *UserState, cs *ColorScheme, tp map[string]string) {
 	adminCP := basecp(state)
 	adminCP.ContentTitle = "Admin"
-	adminCP.ExtraCSSurls = append(adminCP.extraCSSurls, "/css/admin.css")
+	adminCP.ExtraCSSurls = append(adminCP.ExtraCSSurls, "/css/admin.css")
 
 	// Hide the Admin menu if we're on the Admin page
 	adminCP.ContentJS = Hide("#menuAdmin")
