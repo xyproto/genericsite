@@ -94,7 +94,7 @@ func GenerateSearchHandle(pc PageCollection) WebHandle {
 		searchText := UserInput(q)
 		if found {
 			content := "Search: " + string(searchText)
-			nl := tagString("br")
+			nl := TagString("br")
 			content += nl + nl
 			startTime := time.Now()
 			urls, titles, searchedFor, foundWhere := searchResults(searchText, pc)
