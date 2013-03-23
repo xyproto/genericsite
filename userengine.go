@@ -14,6 +14,14 @@ import (
 	"github.com/xyproto/web"
 )
 
+type UserState struct {
+	// see: http://redis.io/topics/data-types
+	users       *RedisHashMap   // Hash map of users, with several different fields per user ("loggedin", "confirmed", "email" etc)
+	usernames   *RedisSet       // A list of all usernames, for easy enumeration
+	unconfirmed *RedisSet       // A list of unconfirmed usernames, for easy enumeration
+	pool        *ConnectionPool // A connection pool for Redis
+}
+
 // An Engine is a specific piece of a website
 // This part handles the login/logout/registration/confirmation pages
 
@@ -31,6 +39,10 @@ const (
 	MINIMUM_CONFIRMATION_CODE_LENGTH = 20
 	USERNAME_ALLOWED_LETTERS         = "abcdefghijklmnopqrstuvwxyzæøåABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ_0123456789"
 )
+
+func (state *UserState) GetPool() *ConnectionPool {
+	return state.pool
+}
 
 func NewUserEngine(state *UserState) *UserEngine {
 	return &UserEngine{state}
