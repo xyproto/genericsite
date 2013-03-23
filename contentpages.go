@@ -211,13 +211,6 @@ func PublishCPs(pc PageCollection, cs *ColorScheme, tp map[string]string, cssurl
 	}
 }
 
-//// Returns a DefaultCP with the contentTitle set
-//func DefaultTitleCP(contentTitle string, userState *UserState) *ContentPage {
-//	cp := DefaultCP(userState)
-//	cp.contentTitle = contentTitle
-//	return cp
-//}
-
 type BaseCP func(state *UserState) *ContentPage
 
 func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[string]string) {
