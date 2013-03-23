@@ -455,7 +455,7 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuLogin", "menuNop", 1)
 
-	cp.url = url
+	cp.Url = url
 	return cp
 }
 
@@ -464,7 +464,7 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp.ContentTitle = "Register"
 	cp.ContentHTML = RegisterForm()
 	cp.ContentJS += OnClick("#registerButton", "$('#registerForm').get(0).setAttribute('action', '/register/' + $('#username').val());")
-	cp.url = url
+	cp.Url = url
 
 	// Hide the Register menu if we're on the Register page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
