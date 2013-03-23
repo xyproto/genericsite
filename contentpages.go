@@ -12,30 +12,30 @@ import (
 )
 
 type ContentPage struct {
-	generatedCSSurl          string
-	extraCSSurls             []string
-	jqueryJSurl              string
-	faviconurl               string
-	bgImageURL               string
-	stretchBackground        bool
-	title                    string
-	subtitle                 string
-	links                    []string
-	contentTitle             string
-	contentHTML              string
-	headerJS                 string
-	contentJS                string
-	searchButtonText         string
-	searchURL                string
-	footerText               string
-	backgroundTextureURL     string
-	darkBackgroundTextureURL string
-	footerTextColor          string
-	footerColor              string
-	userState                *UserState
-	roundedLook              bool
-	url                      string
-	colorScheme              *ColorScheme
+	GeneratedCSSurl          string
+	ExtraCSSurls             []string
+	JqueryJSurl              string
+	Faviconurl               string
+	BgImageURL               string
+	StretchBackground        bool
+	Title                    string
+	Subtitle                 string
+	Links                    []string
+	ContentTitle             string
+	ContentHTML              string
+	HeaderJS                 string
+	ContentJS                string
+	SearchButtonText         string
+	SearchURL                string
+	FooterText               string
+	BackgroundTextureURL     string
+	DarkBackgroundTextureURL string
+	FooterTextColor          string
+	FooterColor              string
+	UserState                *UserState
+	RoundedLook              bool
+	Url                      string
+	ColorScheme              *ColorScheme
 }
 
 // Content page generator
