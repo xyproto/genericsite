@@ -57,12 +57,12 @@ type UserState struct {
 }
 
 type ColorScheme struct {
-	darkgray           string
-	nicecolor          string
-	menu_link          string
-	menu_hover         string
-	menu_active        string
-	default_background string
+	Darkgray           string
+	Nicecolor          string
+	Menu_link          string
+	Menu_hover         string
+	Menu_active        string
+	Default_background string
 }
 
 const (
@@ -153,12 +153,12 @@ func DefaultCP(userState *UserState) *ContentPage {
 
 	// The default color scheme
 	var cs ColorScheme
-	cs.darkgray = "#202020"
-	cs.nicecolor = "#5080D0"   // nice blue
-	cs.menu_link = "#c0c0c0"   // light gray
-	cs.menu_hover = "#efefe0"  // light gray, somewhat yellow
-	cs.menu_active = "#ffffff" // white
-	cs.default_background = "#000030"
+	cs.Darkgray = "#202020"
+	cs.Nicecolor = "#5080D0"   // nice blue
+	cs.Menu_link = "#c0c0c0"   // light gray
+	cs.Menu_hover = "#efefe0"  // light gray, somewhat yellow
+	cs.Menu_active = "#ffffff" // white
+	cs.Default_background = "#000030"
 	cp.ColorScheme = &cs
 
 	return &cp
