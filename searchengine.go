@@ -149,11 +149,11 @@ func GenerateSearchCSS(cs *ColorScheme) SimpleContextHandle {
 
 func ServeSearchPages(basecp BaseCP, state *UserState, cps PageCollection, cs *ColorScheme, tp map[string]string) {
 	searchCP := basecp(state)
-	searchCP.contentTitle = "Search results"
-	searchCP.extraCSSurls = append(searchCP.extraCSSurls, "/css/search.css")
+	searchCP.ContentTitle = "Search results"
+	searchCP.ExtraCSSurls = append(searchCP.ExtraCSSurls, "/css/search.css")
 
 	// Hide the Search menu if we're on the Search page
-	searchCP.contentJS = Hide("#menuSearch")
+	searchCP.ContentJS = Hide("#menuSearch")
 
 	// Note, no slash between "search" and "(.*)". A typical search is "/search?q=blabla"
 	web.Get("/search(.*)", searchCP.WrapWebHandle(GenerateSearchHandle(cps), tp))

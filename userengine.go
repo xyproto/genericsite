@@ -447,13 +447,13 @@ func createUserState(pool *ConnectionPool) *UserState {
 
 func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp := basecp(state)
-	cp.contentTitle = "Login"
-	cp.contentHTML = LoginForm()
-	cp.contentJS += OnClick("#loginButton", "$('#loginForm').get(0).setAttribute('action', '/login/' + $('#username').val());")
+	cp.ContentTitle = "Login"
+	cp.ContentHTML = LoginForm()
+	cp.ContentJS += OnClick("#loginButton", "$('#loginForm').get(0).setAttribute('action', '/login/' + $('#username').val());")
 
 	// Hide the Login menu if we're on the Login page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
-	cp.headerJS = strings.Replace(cp.headerJS, "menuLogin", "menuNop", 1)
+	cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuLogin", "menuNop", 1)
 
 	cp.url = url
 	return cp
@@ -461,14 +461,14 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 
 func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp := basecp(state)
-	cp.contentTitle = "Register"
-	cp.contentHTML = RegisterForm()
-	cp.contentJS += OnClick("#registerButton", "$('#registerForm').get(0).setAttribute('action', '/register/' + $('#username').val());")
+	cp.ContentTitle = "Register"
+	cp.ContentHTML = RegisterForm()
+	cp.ContentJS += OnClick("#registerButton", "$('#registerForm').get(0).setAttribute('action', '/register/' + $('#username').val());")
 	cp.url = url
 
 	// Hide the Register menu if we're on the Register page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
-	cp.headerJS = strings.Replace(cp.headerJS, "menuRegister", "menuNop", 1)
+	cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuRegister", "menuNop", 1)
 
 	return cp
 }
