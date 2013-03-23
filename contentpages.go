@@ -159,7 +159,7 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cs.menu_hover = "#efefe0"  // light gray, somewhat yellow
 	cs.menu_active = "#ffffff" // white
 	cs.default_background = "#000030"
-	cp.colorScheme = &cs
+	cp.ColorScheme = &cs
 
 	return &cp
 }
@@ -170,18 +170,18 @@ func genericPageBuilder(cp *ContentPage) *Page {
 	// TODO: Record the time from one step out, because content may be generated and inserted into this generated conten
 	startTime := time.Now()
 
-	page := NewHTML5Page(cp.title + " " + cp.subtitle)
+	page := NewHTML5Page(cp.Title + " " + cp.Subtitle)
 
-	page.LinkToCSS(cp.generatedCSSurl)
-	for _, cssurl := range cp.extraCSSurls {
+	page.LinkToCSS(cp.GeneratedCSSurl)
+	for _, cssurl := range cp.ExtraCSSurls {
 		page.LinkToCSS(cssurl)
 	}
-	page.LinkToJS(cp.jqueryJSurl)
-	page.LinkToFavicon(cp.faviconurl)
+	page.LinkToJS(cp.JqueryJSurl)
+	page.LinkToFavicon(cp.Faviconurl)
 
-	AddHeader(page, cp.headerJS)
-	AddBodyStyle(page, cp.bgImageURL, cp.stretchBackground)
-	AddTopBox(page, cp.title, cp.subtitle, cp.searchURL, cp.searchButtonText, cp.backgroundTextureURL, cp.roundedLook, cp.colorScheme)
+	AddHeader(page, cp.HeaderJS)
+	AddBodyStyle(page, cp.BgImageURL, cp.StretchBackground)
+	AddTopBox(page, cp.Title, cp.Subtitle, cp.SearchURL, cp.SearchButtonText, cp.BackgroundTextureURL, cp.RoundedLook, cp.ColorScheme)
 
 	// TODO:
 	// Use something dynamic to add or remove /login and /register depending on the login status
@@ -192,12 +192,12 @@ func genericPageBuilder(cp *ContentPage) *Page {
 	// TODO: Do this with templates instead
 	// Hide login/logout/register by default
 	hidelist := []string{"/login", "/logout", "/register"} //, "/admin"}
-	AddMenuBox(page, cp.links, hidelist, cp.darkBackgroundTextureURL)
+	AddMenuBox(page, cp.Links, hidelist, cp.DarkBackgroundTextureURL)
 
-	AddContent(page, cp.contentTitle, cp.contentHTML+BodyJS(cp.contentJS))
+	AddContent(page, cp.ContentTitle, cp.ContentHTML+BodyJS(cp.ContentJS))
 
 	elapsed := time.Since(startTime)
-	AddFooter(page, cp.footerText, cp.footerTextColor, cp.footerColor, elapsed)
+	AddFooter(page, cp.FooterText, cp.FooterTextColor, cp.FooterColor, elapsed)
 
 	return page
 }
@@ -207,7 +207,7 @@ func PublishCPs(pc PageCollection, cs *ColorScheme, tp map[string]string, cssurl
 	// For each content page in the page collection
 	for _, cp := range pc {
 		// TODO: different css urls for all of these?
-		cp.Pub(cp.url, cssurl, cs, tp)
+		cp.Pub(cp.Url, cssurl, cs, tp)
 	}
 }
 
@@ -263,13 +263,13 @@ a:active {color:` + cs.menu_active + `;}
 func (cp *ContentPage) Pub(url, cssurl string, cs *ColorScheme, templateContent map[string]string) {
 	genericpage := genericPageBuilder(cp)
 	web.Get(url, GenerateHTMLwithTemplate(genericpage, templateContent))
-	web.Get(cp.generatedCSSurl, GenerateCSS(genericpage))
-	web.Get(cssurl, GenerateMenuCSS(cp.stretchBackground, cs))
+	web.Get(cp.GeneratedCSSurl, GenerateCSS(genericpage))
+	web.Get(cssurl, GenerateMenuCSS(cp.StretchBackground, cs))
 }
 
 // Wrap a lonely string in an entire webpage
 func (cp *ContentPage) Surround(s string, tp map[string]string) (string, string) {
-	cp.contentHTML = s
+	cp.ContentHTML = s
 	archpage := genericPageBuilder(cp)
 	// NOTE: Use GetXML(true) instead of .String() or .GetHTML() because some things are rendered
 	// differently with different text layout!
@@ -280,7 +280,7 @@ func (cp *ContentPage) Surround(s string, tp map[string]string) (string, string)
 func (cp *ContentPage) WrapSimpleWebHandle(swh SimpleWebHandle, tp map[string]string) SimpleWebHandle {
 	return func(val string) string {
 		html, css := cp.Surround(swh(val), tp)
-		web.Get(cp.generatedCSSurl, css)
+		web.Get(cp.GeneratedCSSurl, css)
 		return html
 	}
 }
@@ -289,7 +289,7 @@ func (cp *ContentPage) WrapSimpleWebHandle(swh SimpleWebHandle, tp map[string]st
 func (cp *ContentPage) WrapWebHandle(wh WebHandle, tp map[string]string) WebHandle {
 	return func(ctx *web.Context, val string) string {
 		html, css := cp.Surround(wh(ctx, val), tp)
-		web.Get(cp.generatedCSSurl, css)
+		web.Get(cp.GeneratedCSSurl, css)
 		return html
 	}
 }
@@ -298,7 +298,7 @@ func (cp *ContentPage) WrapWebHandle(wh WebHandle, tp map[string]string) WebHand
 func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tp map[string]string) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		html, css := cp.Surround(sch(ctx), tp)
-		web.Get(cp.generatedCSSurl, css)
+		web.Get(cp.GeneratedCSSurl, css)
 		return html
 	}
 }
