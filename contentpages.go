@@ -48,6 +48,23 @@ type PageCollection []ContentPage
 // This is just to be aware of which data one should be careful with, and to keep it clean.
 type UserInput string
 
+type UserState struct {
+	// see: http://redis.io/topics/data-types
+	users       *RedisHashMap   // Hash map of users, with several different fields per user ("loggedin", "confirmed", "email" etc)
+	usernames   *RedisSet       // A list of all usernames, for easy enumeration
+	unconfirmed *RedisSet       // A list of unconfirmed usernames, for easy enumeration
+	pool        *ConnectionPool // A connection pool for Redis
+}
+
+type ColorScheme struct {
+	darkgray           string
+	nicecolor          string
+	menu_link          string
+	menu_hover         string
+	menu_active        string
+	default_background string
+}
+
 const (
 	JQUERY_VERSION = "1.9.1"
 )
