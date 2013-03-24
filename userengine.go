@@ -25,6 +25,7 @@ type UserState struct {
 // An Engine is a specific piece of a website
 // This part handles the login/logout/registration/confirmation pages
 
+// TODO: Engine should be an interface, not a type
 type UserEngine Engine
 
 const (
@@ -39,6 +40,28 @@ const (
 	MINIMUM_CONFIRMATION_CODE_LENGTH = 20
 	USERNAME_ALLOWED_LETTERS         = "abcdefghijklmnopqrstuvwxyzæøåABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ_0123456789"
 )
+
+// Optimized function for login, logout and register
+func HideIfNotLoginLogoutRegister(threeBooleanURL, logintag, logouttag, registertag string) string {
+	src := "$.get(" + quote(threeBooleanURL) + ", function(data) {"
+	// TODO: See what happens if data < 3 length
+	src += "if (data[0] != \"1\") {" + Hide(logintag) + "};"
+	src += "if (data[1] != \"1\") {" + Hide(logouttag) + "};"
+	src += "if (data[2] != \"1\") {" + Hide(registertag) + "};"
+	src += "});"
+	return src
+}
+
+// Optimized function for login, logout and register
+func ShowIfLoginLogoutRegister(threeBooleanURL, logintag, logouttag, registertag string) string {
+	src := "$.get(" + quote(threeBooleanURL) + ", function(data) {"
+	// TODO: See what happens if data < 3 length
+	src += "if (data[0] == \"1\") {" + ShowInlineAnimated(logintag) + "};"
+	src += "if (data[1] == \"1\") {" + ShowInlineAnimated(logouttag) + "};"
+	src += "if (data[2] == \"1\") {" + ShowInlineAnimated(registertag) + "};"
+	src += "});"
+	return src
+}
 
 func (state *UserState) GetPool() *ConnectionPool {
 	return state.pool
