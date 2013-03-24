@@ -71,7 +71,7 @@ func (state *UserState) UserRights(ctx *web.Context) bool {
 func GenerateShowLogin(state *UserState) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		// If the user is logged in, don't show the "Login" menu
-		if state.UserRights {
+		if state.UserRights(ctx) {
 			return "0"
 		}
 		return "1"
@@ -81,7 +81,7 @@ func GenerateShowLogin(state *UserState) SimpleContextHandle {
 func GenerateShowLogout(state *UserState) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		// If the user is logged in, show the "Logout" menu
-		if state.UserRights {
+		if state.UserRights(ctx) {
 			return "1"
 		}
 		return "0"
@@ -91,7 +91,7 @@ func GenerateShowLogout(state *UserState) SimpleContextHandle {
 func GenerateShowRegister(state *UserState) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		// If the user is logged in, don't show the "Register" menu
-		if state.UserRights {
+		if state.UserRights(ctx) {
 			return "0"
 		}
 		return "1"
