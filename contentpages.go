@@ -155,7 +155,7 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cp.ColorScheme = &cs
 
 	// Menus that are hidden (display:none) by default
-	cp.HiddenMenuIDs := []string{"menuLogin", "menuLogout", "menuRegister"}
+	cp.HiddenMenuIDs = []string{"menuLogin", "menuLogout", "menuRegister"}
 
 	return &cp
 }
