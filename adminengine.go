@@ -14,11 +14,10 @@ import (
 
 type AdminEngine struct {
 	state *UserState
-	url   string
 }
 
-func NewAdminEngine(state *UserState, url string) *AdminEngine {
-	return &AdminEngine{state, url}
+func NewAdminEngine(state *UserState) *AdminEngine {
+	return &AdminEngine{state}
 }
 
 // Checks if the current user is logged in as administrator right now
@@ -30,15 +29,12 @@ func (state *UserState) AdminRights(ctx *web.Context) bool {
 }
 
 // Decide if the menu for this engine should be shown
-func (ae *AdminEngine) ShowMenu(url string, ctx *web.Context) bool {
-	if url == ae.url {
-		return false
-	}
-	if ae.state.AdminRights(ctx) {
-		return true
-	}
-	return false
-}
+//func (ae *AdminEngine) ShowMenu(url string, ctx *web.Context) bool {
+//	if ae.state.AdminRights(ctx) {
+//		return true
+//	}
+//	return false
+//}
 
 func (ae *AdminEngine) ServePages(basecp BaseCP, tp map[string]string) {
 	state := ae.state
