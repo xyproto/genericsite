@@ -14,7 +14,7 @@ import (
 
 type AdminEngine struct {
 	state *UserState
-	url string
+	url   string
 }
 
 func NewAdminEngine(state *UserState, url string) *AdminEngine {
@@ -397,5 +397,3 @@ table, th, tr, td {
 		//
 	}
 }
-
-

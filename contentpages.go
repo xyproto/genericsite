@@ -53,7 +53,7 @@ type Engine interface {
 	SetState(*UserState)
 	GenerateCSS(*ColorScheme) SimpleContextHandle
 	ShowMenu(url string, ctx *web.Context) bool // Show menu for this engine?
-    ServePages(BaseCP, *ColorScheme, map[string]string)
+	ServePages(BaseCP, *ColorScheme, map[string]string)
 	ServeSystem()
 }
 
