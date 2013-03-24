@@ -21,6 +21,7 @@ type ContentPage struct {
 	Title                    string
 	Subtitle                 string
 	Links                    []string
+	Hidelist                 []string
 	ContentTitle             string
 	ContentHTML              string
 	HeaderJS                 string
@@ -153,6 +154,9 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cs.Default_background = "#000030"
 	cp.ColorScheme = &cs
 
+	// Menus that are hidden (display:none) by default
+	cp.Hidelist := []string{"/login", "/logout", "/register"}
+
 	return &cp
 }
 
@@ -181,10 +185,9 @@ func genericPageBuilder(cp *ContentPage) *Page {
 
 	// TODO: Move the menubox into the TopBox
 
-	// TODO: Do this with templates instead
+	// TODO: Do this with templates or CSS instead
 	// Hide login/logout/register by default
-	hidelist := []string{"/login", "/logout", "/register"} //, "/admin"}
-	AddMenuBox(page, cp.Links, hidelist, cp.DarkBackgroundTextureURL)
+	AddMenuBox(page, cp.Links, cp.Hidelist, cp.DarkBackgroundTextureURL)
 
 	AddContent(page, cp.ContentTitle, cp.ContentHTML+BodyJS(cp.ContentJS))
 
