@@ -60,6 +60,14 @@ func InitUserSystem(pool *ConnectionPool) *UserState {
 	return createUserState(pool)
 }
 
+// Checks if the current user is logged in as a user right now
+func (state *UserState) UserRights(ctx *web.Context) bool {
+	if username := GetBrowserUsername(ctx); username != "" {
+		return state.IsLoggedIn(username)
+	}
+	return false
+}
+
 // TODO: Rethink this. Use templates for Login/Logout button?
 // Generate "1" or "0" values for showing the login, logout or register menus,
 // depending on the cookie status and UserState
