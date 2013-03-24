@@ -504,6 +504,7 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	// Hide the Login menu if we're on the Login page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuLogin", "menuNop", 1)
+	cp.ContentJS = Hide("#menuLogin")
 
 	cp.Url = url
 	return cp
@@ -519,6 +520,7 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	// Hide the Register menu if we're on the Register page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuRegister", "menuNop", 1)
+	cp.ContentJS = Hide("#menuRegister")
 
 	return cp
 }
