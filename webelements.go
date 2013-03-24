@@ -9,18 +9,6 @@ import (
 	. "github.com/xyproto/browserspeak"
 )
 
-type Engine struct {
-	state *UserState
-}
-
-func (engine *Engine) SetState(state *UserState) {
-	engine.state = state
-}
-
-func (engine *Engine) GetState() *UserState {
-	return engine.state
-}
-
 func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgroundTextureURL string, roundedLook bool, cs *ColorScheme) (*Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {

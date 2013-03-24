@@ -10,26 +10,15 @@ import (
 	"github.com/xyproto/web"
 )
 
-// An Engine is a specific piece of a website
 // This part handles the "admin" pages
 
-type AdminEngine Engine
-
-const (
-	ADMIN = "1"
-	USER  = "0"
-)
-
-func NewAdminEngine(state *UserState) *AdminEngine {
-	return &AdminEngine{state}
+type AdminEngine struct {
+	state *UserState
+	url string
 }
 
-func AdminMenuJS() string {
-	// This in combination with hiding the link in genericsite.go is cool, but perhaps too much?
-	return ShowInlineAnimatedIf("/showmenu/admin", "#menuAdmin")
-
-	// This is less cool
-	//return HideIfNot("/showmenu/admin", "#menuAdmin")
+func NewAdminEngine(state *UserState, url string) *AdminEngine {
+	return &AdminEngine{state, url}
 }
 
 // Checks if the current user is logged in as administrator right now
@@ -40,78 +29,29 @@ func (state *UserState) AdminRights(ctx *web.Context) bool {
 	return false
 }
 
-func GenerateShowAdmin(state *UserState) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		if state.AdminRights(ctx) {
-			return ADMIN
-		}
-		return USER
+// Decide if the menu for this engine should be shown
+func (ae *AdminEngine) ShowMenu(url string, ctx *web.Context) bool {
+	if url == ae.url {
+		return false
 	}
-}
-
-func GenerateAdminCSS(cs *ColorScheme) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		ctx.ContentType("css")
-		return `
-.yes {
-	background-color: #90ff90;
-	color: black;
-}
-.no {
-	background-color: #ff9090;
-	color: black;
-}
-table {
-	border-collapse: collapse;
-	padding: 1em;
-	margin-top: 1.5em;
-}
-table, th, tr, td {
-	border: 1px solid black;
-	padding: 1em;
-}
-
-.username:link { color: green; }
-.username:visited { color: green; }
-.username:hover { color: green; }
-.username:active { color: green; }
-
-.whitebg {
-	background-color: white;
-}
-
-.darkgrey:link { color: #404040; }
-.darkgrey:visited { color: #404040; }
-.darkgrey:hover { color: #404040; }
-.darkgrey:active { color: #404040; }
-
-.somewhatcareful:link { color: #e09000; }
-.somewhatcareful:visited { color: #e09000; }
-.somewhatcareful:hover { color: #e09000; }
-.somewhatcareful:active { color: #e09000; }
-
-.careful:link { color: #e00000; }
-.careful:visited { color: #e00000; }
-.careful:hover { color: #e00000; }
-.careful:active { color: #e00000; }
-
-`
-		//
+	if ae.state.AdminRights(ctx) {
+		return true
 	}
+	return false
 }
 
-func ServeAdminPages(basecp BaseCP, state *UserState, cs *ColorScheme, tp map[string]string) {
+func (ae *AdminEngine) ServePages(basecp BaseCP, tp map[string]string) {
+	state := ae.state
+
 	adminCP := basecp(state)
 	adminCP.ContentTitle = "Admin"
 	adminCP.ExtraCSSurls = append(adminCP.ExtraCSSurls, "/css/admin.css")
 
 	// Hide the Admin menu if we're on the Admin page
-	adminCP.ContentJS = Hide("#menuAdmin")
+	adminCP.HiddenMenuIDs = append(adminCP.HiddenMenuIDs, "menuAdmin")
 
 	web.Get("/admin", adminCP.WrapSimpleContextHandle(GenerateAdminStatus(state), tp))
-	web.Get("/css/admin.css", GenerateAdminCSS(cs))
-
-	web.Get("/showmenu/admin", GenerateShowAdmin(state))
+	web.Get("/css/admin.css", ae.GenerateCSS(adminCP.ColorScheme))
 }
 
 // TODO: Log and graph when people visit pages and when people contribute content
@@ -406,3 +346,56 @@ func (ae *AdminEngine) ServeSystem() {
 	//web.Get("/cookie/set/(.*)", GenerateSetCookie(state))
 	web.Get("/fixpassword/(.*)", GenerateFixPassword(state))
 }
+
+func (ae *AdminEngine) GenerateCSS(cs *ColorScheme) SimpleContextHandle {
+	return func(ctx *web.Context) string {
+		ctx.ContentType("css")
+		return `
+.yes {
+	background-color: #90ff90;
+	color: black;
+}
+.no {
+	background-color: #ff9090;
+	color: black;
+}
+table {
+	border-collapse: collapse;
+	padding: 1em;
+	margin-top: 1.5em;
+}
+table, th, tr, td {
+	border: 1px solid black;
+	padding: 1em;
+}
+
+.username:link { color: green; }
+.username:visited { color: green; }
+.username:hover { color: green; }
+.username:active { color: green; }
+
+.whitebg {
+	background-color: white;
+}
+
+.darkgrey:link { color: #404040; }
+.darkgrey:visited { color: #404040; }
+.darkgrey:hover { color: #404040; }
+.darkgrey:active { color: #404040; }
+
+.somewhatcareful:link { color: #e09000; }
+.somewhatcareful:visited { color: #e09000; }
+.somewhatcareful:hover { color: #e09000; }
+.somewhatcareful:active { color: #e09000; }
+
+.careful:link { color: #e00000; }
+.careful:visited { color: #e00000; }
+.careful:hover { color: #e00000; }
+.careful:active { color: #e00000; }
+
+`
+		//
+	}
+}
+
+

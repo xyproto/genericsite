@@ -25,9 +25,6 @@ type UserState struct {
 // An Engine is a specific piece of a website
 // This part handles the login/logout/registration/confirmation pages
 
-// TODO: Engine should be an interface, not a type
-type UserEngine Engine
-
 const (
 	ONLY_LOGIN      = "100"
 	ONLY_LOGOUT     = "010"
@@ -41,37 +38,25 @@ const (
 	USERNAME_ALLOWED_LETTERS         = "abcdefghijklmnopqrstuvwxyzæøåABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ_0123456789"
 )
 
-//// Optimized function for login, logout and register
-//func HideIfNotLoginLogoutRegister(threeBooleanURL, logintag, logouttag, registertag string) string {
-//	src := "$.get(" + quote(threeBooleanURL) + ", function(data) {"
-//	// TODO: See what happens if data < 3 length
-//	src += "if (data[0] != \"1\") {" + Hide(logintag) + "};"
-//	src += "if (data[1] != \"1\") {" + Hide(logouttag) + "};"
-//	src += "if (data[2] != \"1\") {" + Hide(registertag) + "};"
-//	src += "});"
-//	return src
-//}
-//
-//// Optimized function for login, logout and register
-//func ShowIfLoginLogoutRegister(threeBooleanURL, logintag, logouttag, registertag string) string {
-//	src := "$.get(" + quote(threeBooleanURL) + ", function(data) {"
-//	// TODO: See what happens if data < 3 length
-//	src += "if (data[0] == \"1\") {" + ShowInlineAnimated(logintag) + "};"
-//	src += "if (data[1] == \"1\") {" + ShowInlineAnimated(logouttag) + "};"
-//	src += "if (data[2] == \"1\") {" + ShowInlineAnimated(registertag) + "};"
-//	src += "});"
-//	return src
-//}
+type UserEngine struct {
+	state *UserState
+}
+
+func NewUserEngine(pool *ConnectionPool) *UserEngine {
+	var ue UserEngine
+	ue.Init(pool)
+	return &ue
+}
 
 func (state *UserState) GetPool() *ConnectionPool {
 	return state.pool
 }
 
-func NewUserEngine(state *UserState) *UserEngine {
-	return &UserEngine{state}
+func (ue *UserEngine) GetState() *UserState {
+	return ue.state
 }
 
-func InitUserSystem(pool *ConnectionPool) *UserState {
+func (ue UserEngine) Init(pool *ConnectionPool) {
 
 	// For the secure cookies
 	// This must happen before the random seeding, or 
@@ -80,7 +65,7 @@ func InitUserSystem(pool *ConnectionPool) *UserState {
 
 	rand.Seed(time.Now().UnixNano())
 
-	return createUserState(pool)
+	ue.state = createUserState(pool)
 }
 
 // Checks if the current user is logged in as a user right now
@@ -91,65 +76,42 @@ func (state *UserState) UserRights(ctx *web.Context) bool {
 	return false
 }
 
-func GenerateShowLogin(state *UserState) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		// If the user is logged in, don't show the "Login" menu
-		if state.UserRights(ctx) {
-			return "0"
-		}
-		return "1"
-	}
+// TODO: Consider changing ShowMenu in the Engine interface
+func (ue *UserEngine) ShowMenu(url string, ctx *web.Context) bool {
+	return true
 }
 
-func GenerateShowLogout(state *UserState) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		// If the user is logged in, show the "Logout" menu
-		if state.UserRights(ctx) {
-			return "1"
-		}
-		return "0"
+// The login menu
+func (ue *UserEngine) ShowLoginMenu(url string, ctx *web.Context) bool {
+	if url == "/login" {
+		return false
 	}
+	if ue.state.UserRights(ctx) {
+		return false
+	}
+	return true
 }
 
-func GenerateShowRegister(state *UserState) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		// If the user is logged in, don't show the "Register" menu
-		if state.UserRights(ctx) {
-			return "0"
-		}
-		return "1"
+// The logout menu
+func (ue *UserEngine) ShowLogoutMenu(url string, ctx *web.Context) bool {
+	if url == "/logout" {
+		return false
 	}
+	if ue.state.UserRights(ctx) {
+		return true
+	}
+	return false
 }
 
-// TODO: Rethink this. Use templates for Login/Logout button?
-// Generate "1" or "0" values for showing the login, logout or register menus,
-// depending on the cookie status and UserState
-func GenerateShowLoginLogoutRegister(state *UserState) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		if username := GetBrowserUsername(ctx); username != "" {
-			//print("USERNAME", username)
-			// Has a username stored in the browser
-			if state.IsLoggedIn(username) {
-				// Ok, logged in to the system + login cookie in the browser
-				// Only present the "Logout" menu
-				return ONLY_LOGOUT
-			} else {
-				// Has a login cookie, but is not logged in.
-				// Keep the browser cookie (could be tempting to remove it)
-				// Present only the "Login" menu
-				//return "100"
-				// Present both "Login" and "Register", just in case it's a new user
-				// in the same browser.
-				return EXCEPT_LOGOUT
-			}
-		} else {
-			// Does not have a username stored in the browser
-			// Present the "Register" and "Login" menu
-			return EXCEPT_LOGOUT
-		}
-		// Everything went wrong, should never reach this point
-		return NOTHING
+// The register menu
+func (ue *UserEngine) ShowRegisterMenu(url string, ctx *web.Context) bool {
+	if url == "/register" {
+		return false
 	}
+	if ue.state.UserRights(ctx) {
+		return false
+	}
+	return true
 }
 
 // TODO: Don't return false if there is an error, the user may exist
@@ -160,13 +122,6 @@ func (state *UserState) HasUser(username string) bool {
 		panic("ERROR: Lost connection to Redis?")
 	}
 	return val
-}
-
-func UserMenuJS() string {
-	// Make sure these corresponds with the menu names from AddMenuBox()
-	// This only works at first page load in Internet Explorer 8. Fun times. Oh well, why bother.
-	//return ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
-	return ShowInlineAnimatedIf("/showmenu/login", "#menuLogin") + ShowInlineAnimatedIf("/showmenu/logout", "#menuLogout") + ShowInlineAnimatedIf("/showmenu/register", "#menuRegister")
 }
 
 // Creates a user without doing ANY checks
@@ -496,6 +451,7 @@ func (state *UserState) SetBrowserUsername(ctx *web.Context, username string) er
 	if !state.HasUser(username) {
 		return errors.New("Can't store cookie for non-existsing user")
 	}
+	// TODO: Users should be able to select their own cookie timeout
 	// Create a cookie that lasts for one hour,
 	// this is the equivivalent of a session for a given username
 	ctx.SetSecureCookiePath("user", username, 3600, "/")
@@ -503,7 +459,7 @@ func (state *UserState) SetBrowserUsername(ctx *web.Context, username string) er
 	return nil
 }
 
-func GenerateNoJavascript() SimpleContextHandle {
+func GenerateNoJavascriptMessage() SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		return MessageOKback("JavaScript error", "Logging in without cookies and javascript enabled, in a modern browser, is not yet supported.<br />Elinks will be supported in the future.")
 	}
@@ -528,7 +484,7 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	// Hide the Login menu if we're on the Login page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuLogin", "menuNop", 1)
-	cp.ContentJS += Hide("#menuLogin")
+	//cp.ContentJS += Hide("#menuLogin")
 
 	cp.Url = url
 	return cp
@@ -544,7 +500,7 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	// Hide the Register menu if we're on the Register page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuRegister", "menuNop", 1)
-	cp.ContentJS += Hide("#menuRegister")
+	//cp.ContentJS += Hide("#menuRegister")
 
 	return cp
 }
@@ -553,11 +509,7 @@ func (ue *UserEngine) ServeSystem() {
 	state := ue.state
 	web.Post("/register/(.*)", GenerateRegisterUser(state))
 	web.Post("/login/(.*)", GenerateLoginUser(state))
-	web.Post("/login", GenerateNoJavascript())
+	web.Post("/login", GenerateNoJavascriptMessage())
 	web.Get("/logout", GenerateLogoutCurrentUser(state))
 	web.Get("/confirm/(.*)", GenerateConfirmUser(state))
-
-	web.Get("/showmenu/login", GenerateShowLogin(state))
-	web.Get("/showmenu/logout", GenerateShowLogout(state))
-	web.Get("/showmenu/register", GenerateShowRegister(state))
 }

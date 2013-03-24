@@ -1,7 +1,5 @@
 package genericsite
 
-// TODO: Move some of these to "browserspeak"
-
 import (
 	"mime"
 	"time"
@@ -49,6 +47,16 @@ type PageCollection []ContentPage
 // This is just to be aware of which data one should be careful with, and to keep it clean.
 type UserInput string
 
+// Engine is a sub-system, a collection of sub-pages, that can be served
+type Engine interface {
+	GetState() *UserState
+	SetState(*UserState)
+	GenerateCSS(*ColorScheme) SimpleContextHandle
+	ShowMenu(url string, ctx *web.Context) bool // Show menu for this engine?
+    ServePages(BaseCP, *ColorScheme, map[string]string)
+	ServeSystem()
+}
+
 type ColorScheme struct {
 	Darkgray           string
 	Nicecolor          string
@@ -61,39 +69,6 @@ type ColorScheme struct {
 const (
 	JQUERY_VERSION = "1.9.1"
 )
-
-// browserspeak
-var globalStringCache map[string]string
-
-// browserspeak
-// Wrap a SimpleContextHandle so that the output is cached (with an id)
-// Do not cache functions with side-effects! (that sets the mimetype for instance)
-// The safest thing for now is to only cache images.
-func CacheWrapper(id string, f SimpleContextHandle) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		if _, ok := globalStringCache[id]; !ok {
-			globalStringCache[id] = f(ctx)
-		}
-		return globalStringCache[id]
-	}
-}
-
-// browserspeak
-func Publish(url, filename string, cache bool) {
-	if cache {
-		web.Get(url, CacheWrapper(url, File(filename)))
-	} else {
-		web.Get(url, File(filename))
-	}
-}
-
-// TODO: get style values from a file instead?
-func AddHeader(page *Page, js string) {
-	AddGoogleFonts(page, []string{"Armata"}) //, "Junge"})
-	// TODO: Move to browserspeak
-	page.MetaCharset("UTF-8")
-	AddScriptToHeader(page, js)
-}
 
 // The default settings
 // Do not publish this page directly, but use it as a basis for the other pages
@@ -126,26 +101,6 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cp.UserState = userState
 	cp.RoundedLook = false
 
-	// Javascript that applies everywhere
-	//cp.contentJS += HideIfNot("/showmenu/login", "#menuLogin")
-	//cp.contentJS += HideIfNot("/showmenu/logout", "#menuLogout")
-	//cp.contentJS += HideIfNot("/showmenu/register", "#menuRegister")
-	//cp.contentJS += HideIfNotLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
-	//cp.contentJS += ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
-
-	// This only works at first page load in Internet Explorer 8. Fun times. Oh well, why bother.
-	//cp.HeaderJS += ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
-
-	// Login, logout and register
-	cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/login", "#menuLogin")
-	cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/logout", "#menuLogout")
-	cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/register", "#menuRegister")
-
-	// This in combination with hiding the link in genericsite.go is cool, but the layout becomes weird :/
-	cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/admin", "#menuAdmin")
-	// This keeps the layout but is less cool
-	//cp.HeaderJS += HideIfNot("/showmenu/admin", "#menuAdmin")
-
 	cp.Url = "/" // To be filled in when published
 
 	// The default color scheme
@@ -158,14 +113,12 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cs.Default_background = "#000030"
 	cp.ColorScheme = &cs
 
-	// Menus that are hidden (display:none) by default
+	// Menus that are hidden (not generated) by default
 	cp.HiddenMenuIDs = []string{"menuLogin", "menuLogout", "menuRegister"}
 
 	return &cp
 }
 
-// TODO: Consider using Mustache for replacing elements after the page has been generated
-// (for showing/hiding "login", "logout" or "register"
 func genericPageBuilder(cp *ContentPage) *Page {
 	// TODO: Record the time from one step out, because content may be generated and inserted into this generated conten
 	startTime := time.Now()
@@ -180,6 +133,7 @@ func genericPageBuilder(cp *ContentPage) *Page {
 	page.LinkToFavicon(cp.Faviconurl)
 
 	AddHeader(page, cp.HeaderJS)
+	AddGoogleFonts(page, []string{"Armata"}) //, "Junge"})
 	AddBodyStyle(page, cp.BgImageURL, cp.StretchBackground)
 	AddTopBox(page, cp.Title, cp.Subtitle, cp.SearchURL, cp.SearchButtonText, cp.BackgroundTextureURL, cp.RoundedLook, cp.ColorScheme)
 
@@ -212,6 +166,7 @@ func PublishCPs(pc PageCollection, cs *ColorScheme, tp map[string]string, cssurl
 
 type BaseCP func(state *UserState) *ContentPage
 
+// Some Engines like Admin must be served separately
 func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[string]string) {
 	// Add pages for login, logout and register
 	cps = append(cps, *LoginCP(basecp, userState, "/login"))
@@ -221,7 +176,8 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[s
 	PublishCPs(cps, cs, tp, "/css/extra.css")
 
 	ServeSearchPages(basecp, userState, cps, cs, tp)
-	ServeAdminPages(basecp, userState, cs, tp)
+
+	//ServeAdminPages(basecp, userState, cs, tp)
 
 	// TODO: Add fallback to this local version
 	Publish("/js/jquery-"+JQUERY_VERSION+".js", "static/js/jquery-"+JQUERY_VERSION+".js", true)
@@ -302,18 +258,19 @@ func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tp map[s
 	}
 }
 
-func InitSystem() *UserState {
+func InitSystem() *ConnectionPool {
 	// These common ones are missing!
 	mime.AddExtensionType(".txt", "text/plain; charset=utf-8")
 	mime.AddExtensionType(".ico", "image/x-icon")
 
 	// Create a Redis connection pool
-	pool := NewRedisConnectionPool()
+	return NewRedisConnectionPool()
+
 	//if err != nil {
 	//	panic("ERROR: Can't connect to redis")
 	//}
-	defer pool.Close()
+	//defer pool.Close()
 
 	// The login system, returns a *UserState
-	return InitUserSystem(pool)
+	//return InitUserSystem(pool)
 }
