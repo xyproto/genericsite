@@ -243,7 +243,7 @@ func AddTitleBox(tag *Tag, title, subtitle string, cs *ColorScheme) *Tag {
 }
 
 // Takes a page and a colon-separated string slice of text:url, hiddenlinks is just a list of the url part
-func AddMenuBox(page *Page, links, hiddenlinks []string, darkBackgroundTexture string) (*Tag, error) {
+func AddMenuBox(page *Page, links, hiddenMenuEntries []string, darkBackgroundTexture string) (*Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {
 		return nil, err
@@ -283,14 +283,15 @@ func AddMenuBox(page *Page, links, hiddenlinks []string, darkBackgroundTexture s
 		li = ul.AddNewTag("li")
 
 		// TODO: Make sure not duplicate ids are added for two menu entries named "Hi there" and "Hi you"
-		li.AddAttr("id", "menu"+firstword)
+		menuId := "menu" + firstword
+		li.AddAttr("id", menuId)
 		li.AddStyle("display", "inline")
 		li.SansSerif()
 		//li.CustomSansSerif("Armata")
 
 		// Hide the menu items with matching urls
-		for _, val := range hiddenlinks {
-			if val == url {
+		for _, val := range hiddenMenuEntries {
+			if val == menuId {
 				li.AddStyle("display", "none")
 				break
 			}
