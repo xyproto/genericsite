@@ -142,7 +142,10 @@ func (state *UserState) HasUser(username string) bool {
 func UserMenuJS() string {
 	// Make sure these corresponds with the menu names from AddMenuBox()
 	// This only works at first page load in Internet Explorer 8. Fun times. Oh well, why bother.
-	return ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
+	//return ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
+	return ShowInlineAnimatedIf("/showmenu/login", "#menuLogin") \
+	+ ShowInlineAnimatedIf("/showmenu/logout", "#menuLogout") \
+	+ ShowInlineAnimatedIf("/showmenu/register", "#menuRegister")
 }
 
 // Creates a user without doing ANY checks
@@ -504,7 +507,7 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	// Hide the Login menu if we're on the Login page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuLogin", "menuNop", 1)
-	cp.HeaderJS += Hide("#menuLogin")
+	cp.ContentJS += Hide("#menuLogin")
 
 	cp.Url = url
 	return cp
@@ -520,7 +523,7 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	// Hide the Register menu if we're on the Register page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuRegister", "menuNop", 1)
-	cp.HeaderJS += Hide("#menuRegister")
+	cp.ContentJS += Hide("#menuRegister")
 
 	return cp
 }

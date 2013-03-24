@@ -134,12 +134,12 @@ func DefaultCP(userState *UserState) *ContentPage {
 	//cp.contentJS += ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
 
 	// This only works at first page load in Internet Explorer 8. Fun times. Oh well, why bother.
-	cp.HeaderJS += ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
+	//cp.HeaderJS += ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
 
 	// Login, logout and register
-	//cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/login", "#menuLogin")
-	//cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/logout", "#menuLogout")
-	//cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/register", "#menuRegister")
+	cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/login", "#menuLogin")
+	cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/logout", "#menuLogout")
+	cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/register", "#menuRegister")
 
 	// This in combination with hiding the link in genericsite.go is cool, but the layout becomes weird :/
 	cp.HeaderJS += ShowInlineAnimatedIf("/showmenu/admin", "#menuAdmin")
