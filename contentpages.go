@@ -137,10 +137,9 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cp.HeaderJS += ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
 
 	// This in combination with hiding the link in genericsite.go is cool, but the layout becomes weird :/
-	//cp.headerJS += ShowAnimatedIf("/showmenu/admin", "#menuAdmin")
-
+	cp.headerJS += ShowInlineAnimatedIf("/showmenu/admin", "#menuAdmin")
 	// This keeps the layout but is less cool
-	cp.HeaderJS += HideIfNot("/showmenu/admin", "#menuAdmin")
+	//cp.HeaderJS += HideIfNot("/showmenu/admin", "#menuAdmin")
 
 	cp.Url = "/" // To be filled in when published
 
