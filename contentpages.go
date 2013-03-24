@@ -66,6 +66,8 @@ type ColorScheme struct {
 	Default_background string
 }
 
+type BaseCP func(state *UserState) *ContentPage
+
 const (
 	JQUERY_VERSION = "1.9.1"
 )
@@ -164,7 +166,6 @@ func PublishCPs(pc PageCollection, cs *ColorScheme, tp map[string]string, cssurl
 	}
 }
 
-type BaseCP func(state *UserState) *ContentPage
 
 // Some Engines like Admin must be served separately
 func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[string]string) {
