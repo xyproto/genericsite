@@ -68,6 +68,36 @@ func (state *UserState) UserRights(ctx *web.Context) bool {
 	return false
 }
 
+func GenerateShowLogin(state *UserState) SimpleContextHandle {
+	return func(ctx *web.Context) string {
+		// If the user is logged in, don't show the "Login" menu
+		if state.UserRights {
+			return "0"
+		}
+		return "1"
+	}
+}
+
+func GenerateShowLogout(state *UserState) SimpleContextHandle {
+	return func(ctx *web.Context) string {
+		// If the user is logged in, show the "Logout" menu
+		if state.UserRights {
+			return "1"
+		}
+		return "0"
+	}
+}
+
+func GenerateShowRegister(state *UserState) SimpleContextHandle {
+	return func(ctx *web.Context) string {
+		// If the user is logged in, don't show the "Register" menu
+		if state.UserRights {
+			return "0"
+		}
+		return "1"
+	}
+}
+
 // TODO: Rethink this. Use templates for Login/Logout button?
 // Generate "1" or "0" values for showing the login, logout or register menus,
 // depending on the cookie status and UserState
@@ -500,4 +530,8 @@ func (ue *UserEngine) ServeSystem() {
 	web.Post("/login", GenerateNoJavascript())
 	web.Get("/logout", GenerateLogoutCurrentUser(state))
 	web.Get("/confirm/(.*)", GenerateConfirmUser(state))
+
+	web.Get("/showmenu/login", GenerateShowLogin(state))
+	web.Get("/showmenu/logout", GenerateShowLogout(state))
+	web.Get("/showmenu/register", GenerateShowRegister(state))
 }
