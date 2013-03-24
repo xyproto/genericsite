@@ -143,9 +143,7 @@ func UserMenuJS() string {
 	// Make sure these corresponds with the menu names from AddMenuBox()
 	// This only works at first page load in Internet Explorer 8. Fun times. Oh well, why bother.
 	//return ShowIfLoginLogoutRegister("/showmenu/loginlogoutregister", "#menuLogin", "#menuLogout", "#menuRegister")
-	return ShowInlineAnimatedIf("/showmenu/login", "#menuLogin") \
-	+ ShowInlineAnimatedIf("/showmenu/logout", "#menuLogout") \
-	+ ShowInlineAnimatedIf("/showmenu/register", "#menuRegister")
+	return ShowInlineAnimatedIf("/showmenu/login", "#menuLogin") + ShowInlineAnimatedIf("/showmenu/logout", "#menuLogout") + ShowInlineAnimatedIf("/showmenu/register", "#menuRegister")
 }
 
 // Creates a user without doing ANY checks
