@@ -273,10 +273,14 @@ func AddMenuBox(page *Page, links, hiddenMenuEntries []string, darkBackgroundTex
 		// TODO: Make sure not duplicate ids are added for two menu entries named "Hi there" and "Hi you"
 		menuId := "menu" + firstword
 		li.AddAttr("id", menuId)
-		li.AddStyle("display", "inline")
+
+		// All menu entries are now hidden by default!
+		li.AddStyle("display", "none")
+		//li.AddStyle("display", "inline")
 		li.SansSerif()
 		//li.CustomSansSerif("Armata")
 
+		// TODO: Remove this
 		// Hide the menu items with matching urls
 		for _, val := range hiddenMenuEntries {
 			if val == menuId {

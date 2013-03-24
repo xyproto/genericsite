@@ -43,9 +43,6 @@ func (ae *AdminEngine) ServePages(basecp BaseCP, tp map[string]string) {
 	adminCP.ContentTitle = "Admin"
 	adminCP.ExtraCSSurls = append(adminCP.ExtraCSSurls, "/css/admin.css")
 
-	// Hide the Admin menu if we're on the Admin page
-	adminCP.HiddenMenuIDs = append(adminCP.HiddenMenuIDs, "menuAdmin")
-
 	web.Get("/admin", adminCP.WrapSimpleContextHandle(GenerateAdminStatus(state), tp))
 	web.Get("/css/admin.css", ae.GenerateCSS(adminCP.ColorScheme))
 }
@@ -104,8 +101,8 @@ func GenerateAdminStatus(state *UserState) SimpleContextHandle {
 			for _, username := range usernames {
 				s += "<tr>"
 				s += "<td><a class=\"username\" href=\"/status/" + username + "\">" + username + "</a></td>"
-				secret := state.GetConfirmationSecret(username)
-				s += "<td><a class=\"somewhatcareful\" href=\"/confirm/" + secret + "\">" + secret + "</a></td>"
+				confirmationCode := state.GetConfirmationCode(username)
+				s += "<td><a class=\"somewhatcareful\" href=\"/confirm/" + confirmationCode + "\">" + confirmationCode + "</a></td>"
 				s += "<td><a class=\"careful\" href=\"/removeunconfirmed/" + username + "\">remove</a></td>"
 				s += "</tr>"
 			}
@@ -197,7 +194,7 @@ func GenerateRemoveUnconfirmedUser(state *UserState) WebHandle {
 		state.unconfirmed.Del(username)
 
 		// Remove additional data as well
-		state.users.Del(username, "secret")
+		state.users.Del(username, "confirmationCode")
 
 		return MessageOKurl("Remove unconfirmed user", "OK, removed "+username+" from the list of unconfirmed users.", "/admin")
 	}
@@ -347,6 +344,10 @@ func (ae *AdminEngine) GenerateCSS(cs *ColorScheme) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		ctx.ContentType("css")
 		return `
+#menuAdmin {
+	display: none;
+}
+
 .yes {
 	background-color: #90ff90;
 	color: black;

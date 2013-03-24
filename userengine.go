@@ -26,14 +26,6 @@ type UserState struct {
 // This part handles the login/logout/registration/confirmation pages
 
 const (
-	ONLY_LOGIN      = "100"
-	ONLY_LOGOUT     = "010"
-	ONLY_REGISTER   = "001"
-	EXCEPT_LOGIN    = "011"
-	EXCEPT_LOGOUT   = "101"
-	EXCEPT_REGISTER = "110"
-	NOTHING         = "000"
-
 	MINIMUM_CONFIRMATION_CODE_LENGTH = 20
 	USERNAME_ALLOWED_LETTERS         = "abcdefghijklmnopqrstuvwxyzæøåABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ_0123456789"
 )
@@ -165,28 +157,28 @@ func CorrectPassword(state *UserState, username, password string) bool {
 	return false
 }
 
-func (state *UserState) GetConfirmationSecret(username string) string {
-	secret, err := state.users.Get(username, "secret")
+func (state *UserState) GetConfirmationCode(username string) string {
+	confirmationCode, err := state.users.Get(username, "confirmationCode")
 	if err != nil {
 		return ""
 	}
-	return secret
+	return confirmationCode
 }
 
-// Goes through all the secrets of all the unconfirmed users
-// and checks if this secret already is in use
-func AlreadyHasSecret(state *UserState, secret string) bool {
+// Goes through all the confirmationCodes of all the unconfirmed users
+// and checks if this confirmationCode already is in use
+func AlreadyHasConfirmationCode(state *UserState, confirmationCode string) bool {
 	unconfirmedUsernames, err := state.unconfirmed.GetAll()
 	if err != nil {
 		return false
 	}
 	for _, aUsername := range unconfirmedUsernames {
-		aSecret, err := state.users.Get(aUsername, "secret")
+		aConfirmationCode, err := state.users.Get(aUsername, "confirmationCode")
 		if err != nil {
 			// TODO: Inconsistent user, log this
 			continue
 		}
-		if secret == aSecret {
+		if confirmationCode == aConfirmationCode {
 			// Found it
 			return true
 		}
@@ -197,24 +189,24 @@ func AlreadyHasSecret(state *UserState, secret string) bool {
 // Create a user by adding the username to the list of usernames
 func GenerateConfirmUser(state *UserState) WebHandle {
 	return func(ctx *web.Context, val string) string {
-		secret := val
+		confirmationCode := val
 
 		unconfirmedUsernames, err := state.unconfirmed.GetAll()
 		if err != nil {
 			return MessageOKurl("Confirmation", "All users are confirmed already.", "/register")
 		}
 
-		// TODO: Only generate unique secrets
+		// TODO: Only generate unique confirmationCodes
 
-		// Find the username by looking up the secret on unconfirmed users
+		// Find the username by looking up the confirmationCode on unconfirmed users
 		username := ""
 		for _, aUsername := range unconfirmedUsernames {
-			aSecret, err := state.users.Get(aUsername, "secret")
+			aSecret, err := state.users.Get(aUsername, "confirmationCode")
 			if err != nil {
 				// TODO: Inconsistent user! Log this.
 				continue
 			}
-			if secret == aSecret {
+			if confirmationCode == aSecret {
 				// Found the right user
 				username = aUsername
 				break
@@ -233,8 +225,8 @@ func GenerateConfirmUser(state *UserState) WebHandle {
 
 		// Remove from the list of unconfirmed usernames
 		state.unconfirmed.Del(username)
-		// Remove the secret from the user
-		state.users.Del(username, "secret")
+		// Remove the confirmationCode from the user
+		state.users.Del(username, "confirmationCode")
 
 		// Mark user as confirmed
 		state.users.Set(username, "confirmed", "true")
@@ -373,11 +365,11 @@ func GenerateRegisterUser(state *UserState) WebHandle {
 
 		// The confirmation code must be a minimum of 8 letters long
 		length := MINIMUM_CONFIRMATION_CODE_LENGTH
-		secretConfirmationCode := RandomHumanFriendlyString(length)
-		for AlreadyHasSecret(state, secretConfirmationCode) {
-			// Increase the length of the secret random string every time there is a collision
+		confirmationCode := RandomHumanFriendlyString(length)
+		for AlreadyHasConfirmationCode(state, confirmationCode) {
+			// Increase the length of the confirmationCode random string every time there is a collision
 			length++
-			secretConfirmationCode = RandomHumanFriendlyString(length)
+			confirmationCode = RandomHumanFriendlyString(length)
 			if length > 100 {
 				// Something is seriously wrong if this happens
 				// TODO: Log this and sysexit
@@ -385,11 +377,11 @@ func GenerateRegisterUser(state *UserState) WebHandle {
 		}
 
 		// Send confirmation email
-		ConfirmationEmail("archlinux.no", "https://archlinux.no/confirm/"+secretConfirmationCode, username, email)
+		ConfirmationEmail("archlinux.no", "https://archlinux.no/confirm/"+confirmationCode, username, email)
 
 		// Register the need to be confirmed
 		state.unconfirmed.Add(username)
-		state.users.Set(username, "secret", secretConfirmationCode)
+		state.users.Set(username, "confirmationCode", confirmationCode)
 
 		// Redirect
 		//ctx.SetHeader("Refresh", "0; url=/login", true)
@@ -479,6 +471,7 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp.ContentTitle = "Login"
 	cp.ContentHTML = LoginForm()
 	cp.ContentJS += OnClick("#loginButton", "$('#loginForm').get(0).setAttribute('action', '/login/' + $('#username').val());")
+	cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/login.css")
 
 	// Hide the Login menu if we're on the Login page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
@@ -495,6 +488,7 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp.ContentHTML = RegisterForm()
 	cp.ContentJS += OnClick("#registerButton", "$('#registerForm').get(0).setAttribute('action', '/register/' + $('#username').val());")
 	cp.Url = url
+	cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/register.css")
 
 	// Hide the Register menu if we're on the Register page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
@@ -504,6 +498,20 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	return cp
 }
 
+func GenerateRegisterCSS(state *UserState) SimpleContextHandle {
+	return func(ctx *web.Context) string {
+		ctx.ContentType("css")
+		return MenuCSS("Register", state, ctx, []string{})
+	}
+}
+
+func GenerateLoginCSS(state *UserState) SimpleContextHandle {
+	return func(ctx *web.Context) string {
+		ctx.ContentType("css")
+		return MenuCSS("Login", state, ctx, []string{})
+	}
+}
+
 func (ue *UserEngine) ServeSystem() {
 	state := ue.state
 	web.Post("/register/(.*)", GenerateRegisterUser(state))
@@ -511,4 +519,6 @@ func (ue *UserEngine) ServeSystem() {
 	web.Post("/login", GenerateNoJavascriptMessage())
 	web.Get("/logout", GenerateLogoutCurrentUser(state))
 	web.Get("/confirm/(.*)", GenerateConfirmUser(state))
+	web.Get("/css/login.css", GenerateLoginCSS(state))
+	web.Get("/css/register.css", GenerateRegisterCSS(state))
 }

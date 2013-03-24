@@ -3,6 +3,7 @@ package genericsite
 import (
 	"mime"
 	"time"
+	"strings"
 
 	"github.com/drbawb/mustache"
 	. "github.com/xyproto/browserspeak"
@@ -115,8 +116,9 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cs.Default_background = "#000030"
 	cp.ColorScheme = &cs
 
+	// TODO: Remove this, all menus are now hidden by default
 	// Menus that are hidden (not generated) by default
-	cp.HiddenMenuIDs = []string{"menuLogin", "menuLogout", "menuRegister"}
+	//cp.HiddenMenuIDs = []string{"menuLogin", "menuLogout", "menuRegister"}
 
 	return &cp
 }
@@ -158,11 +160,29 @@ func genericPageBuilder(cp *ContentPage) *Page {
 }
 
 // Publish a list of ContentPaages, a colorscheme and template content
-func PublishCPs(pc PageCollection, cs *ColorScheme, tp map[string]string, cssurl string) {
+func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tp map[string]string, cssurl string) {
 	// For each content page in the page collection
 	for _, cp := range pc {
 		// TODO: different css urls for all of these?
-		cp.Pub(cp.Url, cssurl, cs, tp)
+
+		// Find the right link text
+		var menuID, firstword, text, url string
+		var usercontent []string
+		for _, textandurl := range cp.Links {
+			text, url = ColonSplit(textandurl)
+			firstword = text
+			if strings.Contains(text, " ") {
+				firstword = strings.SplitN(text, " ", 2)[0]
+			}
+			if url == cp.Url {
+				menuID = firstword
+			} else {
+				usercontent = append(usercontent, firstword)
+			}
+		}
+		// menuID will now be blank or correct
+
+		cp.Pub(menuID, userState, usercontent, cp.Url, cssurl, cs, tp)
 	}
 }
 
@@ -174,7 +194,7 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[s
 	cps = append(cps, *RegisterCP(basecp, userState, "/register"))
 
 	cs := basecp(userState).ColorScheme
-	PublishCPs(cps, cs, tp, "/css/extra.css")
+	PublishCPs(userState, cps, cs, tp, "/css/extra.css")
 
 	ServeSearchPages(basecp, userState, cps, cs, tp)
 
@@ -189,7 +209,7 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[s
 	Publish("/favicon.ico", "static/img/favicon.ico", false)
 }
 
-func GenerateMenuCSS(stretchBackground bool, cs *ColorScheme) SimpleContextHandle {
+func GenerateMenuCSS(currentMenuID string, state *UserState, usercontent []string, stretchBackground bool, cs *ColorScheme) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		ctx.ContentType("css")
 		// one of the extra css files that are loaded after the main style
@@ -211,16 +231,17 @@ a:active {color:` + cs.Menu_active + `;}
 		} else {
 			retval = "body {\nbackground-color: " + cs.Default_background + ";\n}\n" + retval
 		}
+		retval += MenuCSS(currentMenuID, state, ctx, usercontent)
 		return retval
 	}
 }
 
 // Make an html and css page available
-func (cp *ContentPage) Pub(url, cssurl string, cs *ColorScheme, templateContent map[string]string) {
+func (cp *ContentPage) Pub(currentMenuID string, userState *UserState, usercontent []string, url, cssurl string, cs *ColorScheme, templateContent map[string]string) {
 	genericpage := genericPageBuilder(cp)
 	web.Get(url, GenerateHTMLwithTemplate(genericpage, templateContent))
 	web.Get(cp.GeneratedCSSurl, GenerateCSS(genericpage))
-	web.Get(cssurl, GenerateMenuCSS(cp.StretchBackground, cs))
+	web.Get(cssurl, GenerateMenuCSS(currentMenuID, userState, usercontent, cp.StretchBackground, cs))
 }
 
 // Wrap a lonely string in an entire webpage
