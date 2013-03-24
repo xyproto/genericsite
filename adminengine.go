@@ -26,7 +26,7 @@ func NewAdminEngine(state *UserState) *AdminEngine {
 
 func AdminMenuJS() string {
 	// This in combination with hiding the link in genericsite.go is cool, but perhaps too much?
-	ShowAnimatedInlineIf("/showmenu/admin", "#menuAdmin")
+	ShowInlineAnimatedIf("/showmenu/admin", "#menuAdmin")
 
 	// This is less cool
 	//return HideIfNot("/showmenu/admin", "#menuAdmin")
