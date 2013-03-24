@@ -43,9 +43,17 @@ type UserEngine struct {
 }
 
 func NewUserEngine(pool *ConnectionPool) *UserEngine {
-	var ue UserEngine
-	ue.Init(pool)
-	return &ue
+
+	// For the secure cookies
+	// This must happen before the random seeding, or 
+	// else people will have to log in again after every server restart
+	web.Config.CookieSecret = RandomCookieFriendlyString(30)
+
+	rand.Seed(time.Now().UnixNano())
+
+	state := createUserState(pool)
+
+	return &UserEngine{state}
 }
 
 func (state *UserState) GetPool() *ConnectionPool {
@@ -57,15 +65,6 @@ func (ue *UserEngine) GetState() *UserState {
 }
 
 func (ue UserEngine) Init(pool *ConnectionPool) {
-
-	// For the secure cookies
-	// This must happen before the random seeding, or 
-	// else people will have to log in again after every server restart
-	web.Config.CookieSecret = RandomCookieFriendlyString(30)
-
-	rand.Seed(time.Now().UnixNano())
-
-	ue.state = createUserState(pool)
 }
 
 // Checks if the current user is logged in as a user right now

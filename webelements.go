@@ -298,8 +298,7 @@ func AddMenuBox(page *Page, links, hiddenMenuEntries []string, darkBackgroundTex
 		a.AddContent(text)
 	}
 
-	// For Login, Logout and Register
-	// TODO: Implement this method too
+	// TODO: Finish the template experiment
 	ul.AddLastContent("{{{yihaa}}}")
 
 	sep.AddStyle("display", "inline")
