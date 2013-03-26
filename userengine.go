@@ -56,9 +56,6 @@ func (ue *UserEngine) GetState() *UserState {
 	return ue.state
 }
 
-func (ue UserEngine) Init(pool *ConnectionPool) {
-}
-
 // Checks if the current user is logged in as a user right now
 func (state *UserState) UserRights(ctx *web.Context) bool {
 	if username := GetBrowserUsername(ctx); username != "" {
@@ -67,45 +64,6 @@ func (state *UserState) UserRights(ctx *web.Context) bool {
 	return false
 }
 
-// TODO: Consider changing ShowMenu in the Engine interface
-func (ue *UserEngine) ShowMenu(url string, ctx *web.Context) bool {
-	return true
-}
-
-// The login menu
-func (ue *UserEngine) ShowLoginMenu(url string, ctx *web.Context) bool {
-	if url == "/login" {
-		return false
-	}
-	if ue.state.UserRights(ctx) {
-		return false
-	}
-	return true
-}
-
-// The logout menu
-func (ue *UserEngine) ShowLogoutMenu(url string, ctx *web.Context) bool {
-	if url == "/logout" {
-		return false
-	}
-	if ue.state.UserRights(ctx) {
-		return true
-	}
-	return false
-}
-
-// The register menu
-func (ue *UserEngine) ShowRegisterMenu(url string, ctx *web.Context) bool {
-	if url == "/register" {
-		return false
-	}
-	if ue.state.UserRights(ctx) {
-		return false
-	}
-	return true
-}
-
-// TODO: Don't return false if there is an error, the user may exist
 func (state *UserState) HasUser(username string) bool {
 	val, err := state.usernames.Has(username)
 	if err != nil {
@@ -175,8 +133,9 @@ func AlreadyHasConfirmationCode(state *UserState, confirmationCode string) bool 
 	for _, aUsername := range unconfirmedUsernames {
 		aConfirmationCode, err := state.users.Get(aUsername, "confirmationCode")
 		if err != nil {
-			// TODO: Inconsistent user, log this
-			continue
+			// TODO: Consider just logging the incident instead
+			panic("ERROR: Inconsistent user")
+			//continue
 		}
 		if confirmationCode == aConfirmationCode {
 			// Found it
@@ -195,8 +154,6 @@ func GenerateConfirmUser(state *UserState) WebHandle {
 		if err != nil {
 			return MessageOKurl("Confirmation", "All users are confirmed already.", "/register")
 		}
-
-		// TODO: Only generate unique confirmationCodes
 
 		// Find the username by looking up the confirmationCode on unconfirmed users
 		username := ""
@@ -253,23 +210,22 @@ func GenerateLoginUser(state *UserState) WebHandle {
 		if !state.IsConfirmed(username) {
 			return MessageOKback("Login", "The email for "+username+" has not been confirmed, check your email and follow the link.")
 		}
-
-		// TODO: Hash password, check with hash from database
-
 		if !CorrectPassword(state, username, password) {
 			return MessageOKback("Login", "Wrong password.")
 		}
 
 		// Log in the user by changing the database and setting a secure cookie
 		state.users.Set(username, "loggedin", "true")
-		state.SetBrowserUsername(ctx, username)
+
+		// TODO: Users should be able to select their own cookie timeout
+		state.SetBrowserUsername(ctx, username, 3600)
 
 		// TODO: Use a welcoming messageOK where the user can see when he/she last logged in and from which host
 
-		// TODO: Then redirect to the page the user was at before logging in
 		if username == "admin" {
 			ctx.SetHeader("Refresh", "0; url=/admin", true)
 		} else {
+			// TODO: Redirect to the page the user was at before logging in
 			ctx.SetHeader("Refresh", "0; url=/", true)
 		}
 
@@ -331,7 +287,8 @@ func GenerateRegisterUser(state *UserState) WebHandle {
 		if state.HasUser(username) {
 			return MessageOKback("Register", "That user already exists, try another username.")
 		}
-		// Only some letters are allowed
+
+		// Only some letters are allowed in the username
 	NEXT:
 		for _, letter := range username {
 			for _, allowedLetter := range USERNAME_ALLOWED_LETTERS {
@@ -371,8 +328,8 @@ func GenerateRegisterUser(state *UserState) WebHandle {
 			length++
 			confirmationCode = RandomHumanFriendlyString(length)
 			if length > 100 {
-				// Something is seriously wrong if this happens
-				// TODO: Log this and sysexit
+				// This should never happen
+				panic("ERROR: Too many generated confirmation codes are not unique, something is wrong")
 			}
 		}
 
@@ -385,7 +342,6 @@ func GenerateRegisterUser(state *UserState) WebHandle {
 
 		// Redirect
 		//ctx.SetHeader("Refresh", "0; url=/login", true)
-
 		return MessageOKurl("Registration complete", "Thanks for registering, the confirmation e-mail has been sent.", "/login")
 	}
 }
@@ -401,18 +357,11 @@ func GenerateLogoutCurrentUser(state *UserState) SimpleContextHandle {
 			return MessageOKback("Logout", "user "+username+" does not exist, could not log out")
 		}
 
-		// TODO: Check if the user is logged in already
-
 		// Log out the user by changing the database, the cookie can stay
 		state.users.Set(username, "loggedin", "false")
 
-		//return "OK, user " + username + " logged out"
-
-		// TODO: Redirect to the page the user was at before logging out
-		//ctx.SetHeader("Refresh", "0; url=/", true)
-
-		//return ""
-
+		// Redirect
+		//ctx.SetHeader("Refresh", "0; url=/login", true)
 		return MessageOKurl("Logout", username+" is now logged out. Hope to see you soon!", "/login")
 	}
 }
@@ -424,6 +373,7 @@ func (state *UserState) IsLoggedIn(username string) bool {
 	}
 	status, err := state.users.Get(username, "loggedin")
 	if err != nil {
+		// Returns "no" if the status can not be retrieved
 		return false
 	}
 	return TruthValue(status)
@@ -432,21 +382,20 @@ func (state *UserState) IsLoggedIn(username string) bool {
 // Gets the username that is stored in a cookie in the browser, if available
 func GetBrowserUsername(ctx *web.Context) string {
 	username, _ := ctx.GetSecureCookie("user")
+	// TODO: Return err, then the calling function should notify the user that cookies are needed
 	return username
 }
 
-func (state *UserState) SetBrowserUsername(ctx *web.Context, username string) error {
+func (state *UserState) SetBrowserUsername(ctx *web.Context, username string, timeout int64) error {
 	if username == "" {
 		return errors.New("Can't set cookie for empty username")
 	}
 	if !state.HasUser(username) {
 		return errors.New("Can't store cookie for non-existsing user")
 	}
-	// TODO: Users should be able to select their own cookie timeout
-	// Create a cookie that lasts for one hour,
-	// this is the equivivalent of a session for a given username
-	ctx.SetSecureCookiePath("user", username, 3600, "/")
-	//"Cookie stored: user = " + username + "."
+	// Create a cookie that lasts for a while ("timeout" seconds),
+	// this is the equivivalent of a session for a given username.
+	ctx.SetSecureCookiePath("user", username, timeout, "/")
 	return nil
 }
 
@@ -472,13 +421,13 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp.ContentHTML = LoginForm()
 	cp.ContentJS += OnClick("#loginButton", "$('#loginForm').get(0).setAttribute('action', '/login/' + $('#username').val());")
 	cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/login.css")
+	cp.Url = url
 
 	// Hide the Login menu if we're on the Login page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuLogin", "menuNop", 1)
 	//cp.ContentJS += Hide("#menuLogin")
 
-	cp.Url = url
 	return cp
 }
 
@@ -487,8 +436,8 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp.ContentTitle = "Register"
 	cp.ContentHTML = RegisterForm()
 	cp.ContentJS += OnClick("#registerButton", "$('#registerForm').get(0).setAttribute('action', '/register/' + $('#username').val());")
-	cp.Url = url
 	cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/register.css")
+	cp.Url = url
 
 	// Hide the Register menu if we're on the Register page
 	// TODO: Replace with the entire Javascript expression, not just menuNop?

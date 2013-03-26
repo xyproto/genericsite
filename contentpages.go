@@ -1,7 +1,6 @@
 package genericsite
 
 import (
-	"mime"
 	"time"
 	"strings"
 
@@ -282,8 +281,8 @@ func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tp map[s
 
 func InitSystem() *ConnectionPool {
 	// These common ones are missing!
-	mime.AddExtensionType(".txt", "text/plain; charset=utf-8")
-	mime.AddExtensionType(".ico", "image/x-icon")
+	//mime.AddExtensionType(".txt", "text/plain; charset=utf-8")
+	//mime.AddExtensionType(".ico", "image/x-icon")
 
 	// Create a Redis connection pool
 	return NewRedisConnectionPool()
