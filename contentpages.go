@@ -77,7 +77,7 @@ const (
 func DefaultCP(userState *UserState) *ContentPage {
 	var cp ContentPage
 	cp.GeneratedCSSurl = "/css/style.css"
-	cp.ExtraCSSurls = []string{"/css/extra.css"}
+	cp.ExtraCSSurls = []string{"/css/menu.css"}
 	// TODO: fallback to local jquery.min.js, google how
 	cp.JqueryJSurl = "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" // "/js/jquery-1.9.1.js"
 	cp.Faviconurl = "/favicon.ico"
@@ -193,7 +193,7 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[s
 	cps = append(cps, *RegisterCP(basecp, userState, "/register"))
 
 	cs := basecp(userState).ColorScheme
-	PublishCPs(userState, cps, cs, tp, "/css/extra.css")
+	PublishCPs(userState, cps, cs, tp, "/css/menu.css")
 
 	ServeSearchPages(basecp, userState, cps, cs, tp)
 
@@ -230,7 +230,7 @@ a:active {color:` + cs.Menu_active + `;}
 		} else {
 			retval = "body {\nbackground-color: " + cs.Default_background + ";\n}\n" + retval
 		}
-		retval += MenuCSS(currentMenuID, state, ctx, usercontent)
+		//retval += MenuCSS(currentMenuID, state, ctx, usercontent)
 		return retval
 	}
 }
@@ -243,13 +243,19 @@ func (cp *ContentPage) Pub(currentMenuID string, userState *UserState, userconte
 	web.Get(cssurl, GenerateMenuCSS(currentMenuID, userState, usercontent, cp.StretchBackground, cs))
 }
 
+// TODO: Write a function for rendering a CowboyTag inside a Page by the use of template {{{placeholders}}
+
+// Render a page by inserting data at the {{{placeholders}}} for both html and css
+func RenderPage(page *Page, templateContents map[string]string) (string, string) {
+	// Note that the whitespace formatting of the generated html matter for the menu layout!
+	return mustache.Render(page.String(), templateContents), mustache.Render(page.GetCSS(), templateContents)
+}
+
 // Wrap a lonely string in an entire webpage
-func (cp *ContentPage) Surround(s string, tp map[string]string) (string, string) {
+func (cp *ContentPage) Surround(s string, templateContents map[string]string) (string, string) {
 	cp.ContentHTML = s
 	archpage := genericPageBuilder(cp)
-	// NOTE: Use GetXML(true) instead of .String() or .GetHTML() because some things are rendered
-	// differently with different text layout!
-	return mustache.Render(archpage.GetXML(true), tp), archpage.GetCSS()
+	return RenderPage(archpage, templateContents)
 }
 
 // Uses a given SimpleWebHandle as the contents for the the ContentPage contents
@@ -280,18 +286,6 @@ func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tp map[s
 }
 
 func InitSystem() *ConnectionPool {
-	// These common ones are missing!
-	//mime.AddExtensionType(".txt", "text/plain; charset=utf-8")
-	//mime.AddExtensionType(".ico", "image/x-icon")
-
 	// Create a Redis connection pool
 	return NewRedisConnectionPool()
-
-	//if err != nil {
-	//	panic("ERROR: Can't connect to redis")
-	//}
-	//defer pool.Close()
-
-	// The login system, returns a *UserState
-	//return InitUserSystem(pool)
 }

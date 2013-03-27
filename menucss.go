@@ -17,7 +17,9 @@ func MenuCSS(currentMenuID string, state *UserState, ctx *web.Context, userconte
 	var css string
 	// If logged in, show Logout and the content
 	if state.UserRights(ctx) {
-		css += show("Logout")
+		if currentMenuID != "Logout" {
+			css += show("Logout")
+		}
 
 		// Also show the actual content
 		for _, menuID := range usercontent {
@@ -35,10 +37,16 @@ func MenuCSS(currentMenuID string, state *UserState, ctx *web.Context, userconte
 		}
 	} else {
 		// Only show Login and Register
-		css += show("Login")
-		css += show("Register")
+		if currentMenuID != "Login" {
+			css += show("Login")
+		}
+		if currentMenuID != "Register" {
+			css += show("Register")
+		}
 	}
 	// Always show the Overview menu
 	css += show("Overview")
+	// For debugging
+	css += currentMenuID + "{ color: pink; }"
 	return css
 }

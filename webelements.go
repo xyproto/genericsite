@@ -231,7 +231,7 @@ func AddTitleBox(tag *Tag, title, subtitle string, cs *ColorScheme) *Tag {
 }
 
 // Takes a page and a colon-separated string slice of text:url, hiddenlinks is just a list of the url part
-func AddMenuBox(page *Page, links, hiddenMenuEntries []string, darkBackgroundTexture string) (*Tag, error) {
+func AddMenuBox(page *Page, darkBackgroundTexture string) (*Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {
 		return nil, err
@@ -251,62 +251,7 @@ func AddMenuBox(page *Page, links, hiddenMenuEntries []string, darkBackgroundTex
 	div.AddStyle("position", "fixed")
 	div.AddStyle("box-shadow", "1px 3px 5px rgba(0,0,0, .8)")
 
-	ul := div.AddNewTag("ul")
-	ul.AddStyle("list-style-type", "none")
-	ul.AddStyle("float", "left")
-	ul.AddStyle("margin", "0")
-
-	var a, li, sep *Tag
-	var text, url, firstword string
-
-	for i, text_url := range links {
-		text, url = ColonSplit(text_url)
-
-		firstword = text
-		if strings.Contains(text, " ") {
-			// Get the first word of the menu text
-			firstword = strings.SplitN(text, " ", 2)[0]
-		}
-
-		li = ul.AddNewTag("li")
-
-		// TODO: Make sure not duplicate ids are added for two menu entries named "Hi there" and "Hi you"
-		menuId := "menu" + firstword
-		li.AddAttr("id", menuId)
-
-		// All menu entries are now hidden by default!
-		li.AddStyle("display", "none")
-		//li.AddStyle("display", "inline")
-		li.SansSerif()
-		//li.CustomSansSerif("Armata")
-
-		// TODO: Remove this
-		// Hide the menu items with matching urls
-		for _, val := range hiddenMenuEntries {
-			if val == menuId {
-				li.AddStyle("display", "none")
-				break
-			}
-		}
-
-		// For every element, but not the first one
-		if i > 0 {
-			// Insert a '|' character in a div
-			sep = li.AddNewTag("div")
-			sep.AddContent("|")
-		}
-
-		a = li.AddNewTag("a")
-		a.AddAttr("class", "menulink")
-		a.AddAttr("href", url)
-		a.AddContent(text)
-	}
-
-	// TODO: Finish the template experiment
-	ul.AddLastContent("{{{yihaa}}}")
-
-	sep.AddStyle("display", "inline")
-	sep.AddStyle("color", "#a0a0a0")
+	div.AddLastContent("{{{menu}}}")
 
 	return div, nil
 }
