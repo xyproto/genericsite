@@ -35,7 +35,6 @@ type UserEngine struct {
 }
 
 func NewUserEngine(pool *ConnectionPool) *UserEngine {
-
 	// For the secure cookies
 	// This must happen before the random seeding, or 
 	// else people will have to log in again after every server restart
@@ -43,9 +42,8 @@ func NewUserEngine(pool *ConnectionPool) *UserEngine {
 
 	rand.Seed(time.Now().UnixNano())
 
-	state := createUserState(pool)
-
-	return &UserEngine{state}
+	userState := createUserState(pool)
+	return &UserEngine{userState}
 }
 
 func (state *UserState) GetPool() *ConnectionPool {

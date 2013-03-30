@@ -68,6 +68,8 @@ type ColorScheme struct {
 
 type BaseCP func(state *UserState) *ContentPage
 
+type TemplateValueGeneratorFactory func(*UserState) TemplateValueGenerator
+
 const (
 	JQUERY_VERSION = "1.9.1"
 )
@@ -153,7 +155,7 @@ func genericPageBuilder(cp *ContentPage) *Page {
 }
 
 // Publish a list of ContentPaages, a colorscheme and template content
-func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tp map[string]string, cssurl string) {
+func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tvgf TemplateValueGeneratorFactory, cssurl string) {
 	// For each content page in the page collection
 	for _, cp := range pc {
 		// TODO: different css urls for all of these?
@@ -175,23 +177,21 @@ func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tp map
 		}
 		// menuID will now be blank or correct
 
-		cp.Pub(menuID, userState, usercontent, cp.Url, cssurl, cs, tp)
+		cp.Pub(menuID, userState, usercontent, cp.Url, cssurl, cs, tvgf(userState))
 	}
 }
 
 
 // Some Engines like Admin must be served separately
-func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[string]string) {
+func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory) {
 	// Add pages for login, logout and register
 	cps = append(cps, *LoginCP(basecp, userState, "/login"))
 	cps = append(cps, *RegisterCP(basecp, userState, "/register"))
 
 	cs := basecp(userState).ColorScheme
-	PublishCPs(userState, cps, cs, tp, "/css/menu.css")
+	PublishCPs(userState, cps, cs, tvgf, "/css/menu.css")
 
-	ServeSearchPages(basecp, userState, cps, cs, tp)
-
-	//ServeAdminPages(basecp, userState, cs, tp)
+	ServeSearchPages(basecp, userState, cps, cs, tvgf(userState))
 
 	// TODO: Add fallback to this local version
 	Publish("/js/jquery-"+JQUERY_VERSION+".js", "static/js/jquery-"+JQUERY_VERSION+".js", true)
@@ -232,9 +232,9 @@ a:active {color:` + cs.Menu_active + `;}
 }
 
 // Make an html and css page available
-func (cp *ContentPage) Pub(currentMenuID string, userState *UserState, usercontent []string, url, cssurl string, cs *ColorScheme, templateContent map[string]string) {
+func (cp *ContentPage) Pub(currentMenuID string, userState *UserState, usercontent []string, url, cssurl string, cs *ColorScheme, tvg TemplateValueGenerator) {
 	genericpage := genericPageBuilder(cp)
-	web.Get(url, GenerateHTMLwithTemplate(genericpage, templateContent))
+	web.Get(url, GenerateHTMLwithTemplate(genericpage, tvg))
 	web.Get(cp.GeneratedCSSurl, GenerateCSS(genericpage))
 	web.Get(cssurl, GenerateMenuCSS(currentMenuID, userState, usercontent, cp.StretchBackground, cs))
 }
@@ -254,28 +254,19 @@ func (cp *ContentPage) Surround(s string, templateContents map[string]string) (s
 	return RenderPage(archpage, templateContents)
 }
 
-// Uses a given SimpleWebHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapSimpleWebHandle(swh SimpleWebHandle, tp map[string]string) SimpleWebHandle {
-	return func(val string) string {
-		html, css := cp.Surround(swh(val), tp)
-		web.Get(cp.GeneratedCSSurl, css)
-		return html
-	}
-}
-
 // Uses a given WebHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapWebHandle(wh WebHandle, tp map[string]string) WebHandle {
+func (cp *ContentPage) WrapWebHandle(wh WebHandle, tvg TemplateValueGenerator) WebHandle {
 	return func(ctx *web.Context, val string) string {
-		html, css := cp.Surround(wh(ctx, val), tp)
+		html, css := cp.Surround(wh(ctx, val), tvg(ctx))
 		web.Get(cp.GeneratedCSSurl, css)
 		return html
 	}
 }
 
 // Uses a given SimpleContextHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tp map[string]string) SimpleContextHandle {
+func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tvg TemplateValueGenerator) SimpleContextHandle {
 	return func(ctx *web.Context) string {
-		html, css := cp.Surround(sch(ctx), tp)
+		html, css := cp.Surround(sch(ctx), tvg(ctx))
 		web.Get(cp.GeneratedCSSurl, css)
 		return html
 	}

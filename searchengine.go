@@ -147,7 +147,7 @@ func GenerateSearchCSS(cs *ColorScheme) SimpleContextHandle {
 	}
 }
 
-func ServeSearchPages(basecp BaseCP, state *UserState, cps PageCollection, cs *ColorScheme, tp map[string]string) {
+func ServeSearchPages(basecp BaseCP, state *UserState, cps PageCollection, cs *ColorScheme, tpg TemplateValueGenerator) {
 	searchCP := basecp(state)
 	searchCP.ContentTitle = "Search results"
 	searchCP.ExtraCSSurls = append(searchCP.ExtraCSSurls, "/css/search.css")
@@ -157,6 +157,7 @@ func ServeSearchPages(basecp BaseCP, state *UserState, cps PageCollection, cs *C
 	searchCP.HiddenMenuIDs = append(searchCP.HiddenMenuIDs, "menuSearch")
 
 	// Note, no slash between "search" and "(.*)". A typical search is "/search?q=blabla"
-	web.Get("/search(.*)", searchCP.WrapWebHandle(GenerateSearchHandle(cps), tp))
+	web.Get("/search(.*)", searchCP.WrapWebHandle(GenerateSearchHandle(cps), tpg))
 	web.Get("/css/search.css", GenerateSearchCSS(cs))
 }
+
