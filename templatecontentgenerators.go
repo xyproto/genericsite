@@ -32,44 +32,47 @@ func AddMenuEntry(id string) string {
 	return "<div><a href='" + url + "'>" + text + "</a> | </div>"
 }
 
-func DynamicMenuFactoryAdvanced(currentMenuID string, state *UserState, usercontent []string) TemplateValueGenerator {
-	return func(ctx *web.Context) TemplateValues {
+// TODO: Put one if these in each engine then combine them somehow
+func DynamicMenuFactoryGenerator(state *UserState, currentMenuID string, usercontent []string) TemplateValueGenerator {
+	return func(stte *UserState) TemplateValueGenerator {
+		return func(ctx *web.Context) TemplateValues {
 
-		var retval string
+			var retval string
 
-		// If logged in, show Logout and the content
-		if state.UserRights(ctx) {
-			if currentMenuID != "Logout" {
-				retval += AddMenuEntry("Logout")
-			}
+			// If logged in, show Logout and the content
+			if state.UserRights(ctx) {
+				if currentMenuID != "Logout" {
+					retval += AddMenuEntry("Logout")
+				}
 
-			// Also show the actual content
-			for _, menuID := range usercontent {
-				// Except the page we're on
-				if menuID != currentMenuID {
-					retval += AddMenuEntry(menuID)
+				// Also show the actual content
+				for _, menuID := range usercontent {
+					// Except the page we're on
+					if menuID != currentMenuID {
+						retval += AddMenuEntry(menuID)
+					}
+				}
+
+				// Show admin content
+				if state.AdminRights(ctx) {
+					if currentMenuID != "Admin" {
+						retval += AddMenuEntry("Admin")
+					}
+				}
+			} else {
+				// Only show Login and Register
+				if currentMenuID != "Login" {
+					retval += AddMenuEntry("Login")
+				}
+				if currentMenuID != "Register" {
+					retval += AddMenuEntry("Register")
 				}
 			}
+			// Always show the Overview menu
+			retval += AddMenuEntry("Overview")
 
-			// Show admin content
-			if state.AdminRights(ctx) {
-				if currentMenuID != "Admin" {
-					retval += AddMenuEntry("Admin")
-				}
-			}
-		} else {
-			// Only show Login and Register
-			if currentMenuID != "Login" {
-				retval += AddMenuEntry("Login")
-			}
-			if currentMenuID != "Register" {
-				retval += AddMenuEntry("Register")
-			}
+			return TemplateValues{"menu": retval}
 		}
-		// Always show the Overview menu
-		retval += AddMenuEntry("Overview")
-
-		return TemplateValues{"menu": retval}
 	}
 }
 
