@@ -33,8 +33,8 @@ func AddMenuEntry(id string) string {
 }
 
 // TODO: Put one if these in each engine then combine them somehow
-func DynamicMenuFactoryGenerator(state *UserState, currentMenuID string, usercontent []string) TemplateValueGenerator {
-	return func(stte *UserState) TemplateValueGenerator {
+func DynamicMenuFactoryGenerator(state *UserState, currentMenuID string, usercontent []string) TemplateValueGeneratorFactory {
+	return func(state *UserState) TemplateValueGenerator {
 		return func(ctx *web.Context) TemplateValues {
 
 			var retval string
