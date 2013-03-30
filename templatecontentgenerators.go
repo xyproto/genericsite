@@ -1,5 +1,12 @@
 package genericsite
 
+import (
+	"strings"
+
+	. "github.com/xyproto/browserspeak"
+	"github.com/xyproto/web"
+)
+
 /* 
  * Functions that generate functions that generate content that can be used in templates.
  *
@@ -10,15 +17,7 @@ package genericsite
  * type TemplateValueGeneratorFactory func(*UserState) TemplateValueGenerator
  */
 
-import (
-	"strings"
-
-	. "github.com/xyproto/browserspeak"
-	. "github.com/xyproto/genericsite"
-	"github.com/xyproto/web"
-)
-
-func DynamicMenuFactorySimple(state *UserState) TemplateValueGenerator {
+func DynamicMenuFactory(state *UserState) TemplateValueGenerator {
 	return func(ctx *web.Context) TemplateValues {
 		// Can generate the menu based on both the user state and the web context here
 		return TemplateValues{"menu": "<div style='margin-left: 3em;'><a href='/login'>Login</a> | <a href='/register'>Register</a></div>"}
@@ -28,12 +27,12 @@ func DynamicMenuFactorySimple(state *UserState) TemplateValueGenerator {
 
 //func AddMenuEntry(url, text string) string {
 func AddMenuEntry(id string) string {
-	text := strings.Capitalize(id)
+	text := strings.Title(id)
 	url := "/" + id
 	return "<div><a href='" + url + "'>" + text + "</a> | </div>"
 }
 
-func DynamicMenuFactory(currentMenuID string, state *UserState) TemplateValueGenerator {
+func DynamicMenuFactoryAdvanced(currentMenuID string, state *UserState, usercontent []string) TemplateValueGenerator {
 	return func(ctx *web.Context) TemplateValues {
 
 		var retval string
