@@ -3,14 +3,15 @@ package genericsite
 import (
 	"strings"
 
-	"github.com/xyproto/web"
+	. "github.com/xyproto/browserspeak"
 )
 
-func Menu(links []string) *Page {
+// Generate tags for the menu based on a list of "MenuDescription:/menu/url"
+func MenuSnippet(links []string) *Page {
 	var a, li, sep *Tag
 	var text, url, firstword string
 
-	page, li = CowboyTag("ul")
+	page, ul := CowboyTag("ul")
 	ul.AddStyle("list-style-type", "none")
 	ul.AddStyle("float", "left")
 	ul.AddStyle("margin", "0")
@@ -25,7 +26,7 @@ func Menu(links []string) *Page {
 			firstword = strings.SplitN(text, " ", 2)[0]
 		}
 
-		li = page.AddNewTag("li")
+		li = ul.AddNewTag("li")
 
 		// TODO: Make sure not duplicate ids are added for two menu entries named "Hi there" and "Hi you"
 		menuId := "menu" + firstword

@@ -136,19 +136,13 @@ func genericPageBuilder(cp *ContentPage) *Page {
 	page.LinkToFavicon(cp.Faviconurl)
 
 	AddHeader(page, cp.HeaderJS)
-	AddGoogleFonts(page, []string{"Armata"}) //, "Junge"})
+	AddGoogleFonts(page, []string{"Armata"})
 	AddBodyStyle(page, cp.BgImageURL, cp.StretchBackground)
 	AddTopBox(page, cp.Title, cp.Subtitle, cp.SearchURL, cp.SearchButtonText, cp.BackgroundTextureURL, cp.RoundedLook, cp.ColorScheme)
 
-	// TODO:
-	// Use something dynamic to add or remove /login and /register depending on the login status
-	// The login status can be fetched over AJAX or REST or something.
-
 	// TODO: Move the menubox into the TopBox
 
-	// TODO: Do this with templates or CSS instead
-	// Hide login/logout/register by default
-	AddMenuBox(page, cp.Links, cp.HiddenMenuIDs, cp.DarkBackgroundTextureURL)
+	AddMenuBox(page, cp.DarkBackgroundTextureURL)
 
 	AddContent(page, cp.ContentTitle, cp.ContentHTML+BodyJS(cp.ContentJS))
 
@@ -208,6 +202,7 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tp map[s
 	Publish("/favicon.ico", "static/img/favicon.ico", false)
 }
 
+// CSS for the menu, and a bit more
 func GenerateMenuCSS(currentMenuID string, state *UserState, usercontent []string, stretchBackground bool, cs *ColorScheme) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		ctx.ContentType("css")
@@ -231,6 +226,7 @@ a:active {color:` + cs.Menu_active + `;}
 			retval = "body {\nbackground-color: " + cs.Default_background + ";\n}\n" + retval
 		}
 		//retval += MenuCSS(currentMenuID, state, ctx, usercontent)
+		retval += ".titletext { display: inline; }";
 		return retval
 	}
 }

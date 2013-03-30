@@ -52,7 +52,7 @@ func (ae *AdminEngine) ServePages(basecp BaseCP, tp map[string]string) {
 func GenerateAdminStatus(state *UserState) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		if !state.AdminRights(ctx) {
-			return "<div class=\"no\">Not administrator</div>"
+			return "<div class=\"no\">Not logged in as administrator</div>"
 		}
 
 		// TODO: List all sorts of info, edit users, etc
@@ -127,7 +127,7 @@ func (state *UserState) IsAdministrator(username string) bool {
 func GenerateStatusCurrentUser(state *UserState) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		if !state.AdminRights(ctx) {
-			return MessageOKback("Status", "Not administrator")
+			return MessageOKback("Status", "Not logged in as administrator")
 		}
 		username := GetBrowserUsername(ctx)
 		if username == "" {
@@ -168,7 +168,7 @@ func GenerateStatusUser(state *UserState) WebHandle {
 func GenerateRemoveUnconfirmedUser(state *UserState) WebHandle {
 	return func(ctx *web.Context, username string) string {
 		if !state.AdminRights(ctx) {
-			return MessageOKback("Remove unconfirmed user", "Not administrator")
+			return MessageOKback("Remove unconfirmed user", "Not logged in as administrator")
 		}
 
 		if username == "" {
@@ -207,7 +207,7 @@ func GenerateRemoveUnconfirmedUser(state *UserState) WebHandle {
 func GenerateRemoveUser(state *UserState) WebHandle {
 	return func(ctx *web.Context, username string) string {
 		if !state.AdminRights(ctx) {
-			return MessageOKback("Remove user", "Not administrator")
+			return MessageOKback("Remove user", "Not logged in as administrator")
 		}
 
 		if username == "" {
@@ -230,7 +230,7 @@ func GenerateRemoveUser(state *UserState) WebHandle {
 func GenerateAllUsernames(state *UserState) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		if !state.AdminRights(ctx) {
-			return MessageOKback("List usernames", "Not administrator")
+			return MessageOKback("List usernames", "Not logged in as administrator")
 		}
 		s := ""
 		usernames, err := state.usernames.GetAll()
@@ -246,7 +246,7 @@ func GenerateAllUsernames(state *UserState) SimpleContextHandle {
 func GenerateGetCookie(state *UserState) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		if !state.AdminRights(ctx) {
-			return MessageOKback("Get cookie", "Not administrator")
+			return MessageOKback("Get cookie", "Not logged in as administrator")
 		}
 		username := GetBrowserUsername(ctx)
 		return MessageOKback("Get cookie", "Cookie: username = "+username)
@@ -256,7 +256,7 @@ func GenerateGetCookie(state *UserState) SimpleContextHandle {
 func GenerateSetCookie(state *UserState) WebHandle {
 	return func(ctx *web.Context, username string) string {
 		if !state.AdminRights(ctx) {
-			return MessageOKback("Set cookie", "Not administrator")
+			return MessageOKback("Set cookie", "Not logged in as administrator")
 		}
 		if username == "" {
 			return MessageOKback("Set cookie", "Can't set cookie for empty username")
@@ -274,7 +274,7 @@ func GenerateSetCookie(state *UserState) WebHandle {
 func GenerateToggleAdmin(state *UserState) WebHandle {
 	return func(ctx *web.Context, username string) string {
 		if !state.AdminRights(ctx) {
-			return MessageOKback("Admin toggle", "Not administrator")
+			return MessageOKback("Admin toggle", "Not logged in as administrator")
 		}
 		if username == "" {
 			return MessageOKback("Admin toggle", "Can't set toggle empty username")
@@ -299,7 +299,7 @@ func GenerateToggleAdmin(state *UserState) WebHandle {
 func GenerateFixPassword(state *UserState) WebHandle {
 	return func(ctx *web.Context, username string) string {
 		if !state.AdminRights(ctx) {
-			return MessageOKback("Fix password", "Not administrator")
+			return MessageOKback("Fix password", "Not logged in as administrator")
 		}
 		if username == "" {
 			return MessageOKback("Fix password", "Can't fix empty username")
