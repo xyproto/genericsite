@@ -52,8 +52,7 @@ type Engine interface {
 	GetState() *UserState
 	SetState(*UserState)
 	GenerateCSS(*ColorScheme) SimpleContextHandle
-	ShowMenu(url string, ctx *web.Context) bool // Show menu for this engine?
-	ServePages(BaseCP, *ColorScheme, map[string]string)
+	ServePages(ContentPage)
 	ServeSystem()
 }
 
@@ -69,10 +68,6 @@ type ColorScheme struct {
 type BaseCP func(state *UserState) *ContentPage
 
 type TemplateValueGeneratorFactory func(*UserState) TemplateValueGenerator
-
-const (
-	JQUERY_VERSION = "1.9.1"
-)
 
 // The default settings
 // Do not publish this page directly, but use it as a basis for the other pages
@@ -183,7 +178,8 @@ func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tvgf T
 
 
 // Some Engines like Admin must be served separately
-func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory) {
+// JQuery is at 1.9.1 at the time of writing
+func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jqueryversion string) {
 	// Add pages for login, logout and register
 	cps = append(cps, *LoginCP(basecp, userState, "/login"))
 	cps = append(cps, *RegisterCP(basecp, userState, "/register"))
@@ -194,7 +190,7 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf Tem
 	ServeSearchPages(basecp, userState, cps, cs, tvgf(userState))
 
 	// TODO: Add fallback to this local version
-	Publish("/js/jquery-"+JQUERY_VERSION+".js", "static/js/jquery-"+JQUERY_VERSION+".js", true)
+	Publish("/js/jquery-"+jqueryversion+".js", "static/js/jquery-"+jqueryversion+".js", true)
 
 	// TODO: Generate these
 	Publish("/robots.txt", "static/various/robots.txt", false)
