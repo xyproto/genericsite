@@ -17,59 +17,74 @@ import (
  * type TemplateValueGeneratorFactory func(*UserState) TemplateValueGenerator
  */
 
-func DynamicMenuFactory(state *UserState) TemplateValueGenerator {
-	return func(ctx *web.Context) TemplateValues {
-		// Can generate the menu based on both the user state and the web context here
-		return TemplateValues{"menu": "<div style='margin-left: 3em;'><a href='/login'>Login</a> | <a href='/register'>Register</a></div>"}
-	}
-}
+//func DynamicMenuFactory(state *UserState) TemplateValueGenerator {
+//	return func(ctx *web.Context) TemplateValues {
+//		// Can generate the menu based on both the user state and the web context here
+//		return TemplateValues{"menu": "<div style='margin-left: 3em;'><a href='/login'>Login</a> | <a href='/register'>Register</a></div>"}
+//	}
+//}
 
 
-//func AddMenuEntry(url, text string) string {
-func AddMenuEntry(id string) string {
+//func MenuEntry(url, text string) string {
+func MenuEntry(id string) string {
 	text := strings.Title(id)
-	url := "/" + id
-	return "<div><a href='" + url + "'>" + text + "</a> | </div>"
+	url := "/" + strings.ToLower(id)
+	// TODO: Remove this special case once the menu generation has improved
+	if url == "/overview" {
+		url = "/"
+	}
+	return "<a href='" + url + "'>" + text + "</a> | "
 }
 
+func MenuStart() string {
+	return "<div style='margin-left: 3em;'>"
+}
+
+func MenuEnd() string {
+	return "</div>"
+}
+
+// TODO: Take the same parameters as the old menu generating code
 // TODO: Put one if these in each engine then combine them somehow
-func DynamicMenuFactoryGenerator(state *UserState, currentMenuID string, usercontent []string) TemplateValueGeneratorFactory {
+func DynamicMenuFactoryGenerator(currentMenuID string, usercontent []string) TemplateValueGeneratorFactory {
 	return func(state *UserState) TemplateValueGenerator {
 		return func(ctx *web.Context) TemplateValues {
 
-			var retval string
+			retval := MenuStart()
+
+			// Always show the Overview menu
+			retval += MenuEntry("Overview")
 
 			// If logged in, show Logout and the content
 			if state.UserRights(ctx) {
 				if currentMenuID != "Logout" {
-					retval += AddMenuEntry("Logout")
+					retval += MenuEntry("Logout")
 				}
 
 				// Also show the actual content
 				for _, menuID := range usercontent {
 					// Except the page we're on
 					if menuID != currentMenuID {
-						retval += AddMenuEntry(menuID)
+						retval += MenuEntry(menuID)
 					}
 				}
 
 				// Show admin content
 				if state.AdminRights(ctx) {
 					if currentMenuID != "Admin" {
-						retval += AddMenuEntry("Admin")
+						retval += MenuEntry("Admin")
 					}
 				}
 			} else {
 				// Only show Login and Register
 				if currentMenuID != "Login" {
-					retval += AddMenuEntry("Login")
+					retval += MenuEntry("Login")
 				}
 				if currentMenuID != "Register" {
-					retval += AddMenuEntry("Register")
+					retval += MenuEntry("Register")
 				}
 			}
-			// Always show the Overview menu
-			retval += AddMenuEntry("Overview")
+			retval += MenuEnd()
 
 			return TemplateValues{"menu": retval}
 		}
