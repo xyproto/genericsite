@@ -434,7 +434,7 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp.ContentTitle = "Register"
 	cp.ContentHTML = RegisterForm()
 	cp.ContentJS += OnClick("#registerButton", "$('#registerForm').get(0).setAttribute('action', '/register/' + $('#username').val());")
-	cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/register.css")
+	//cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/register.css")
 	cp.Url = url
 
 	// Hide the Register menu if we're on the Register page
@@ -445,20 +445,6 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	return cp
 }
 
-func GenerateRegisterCSS(state *UserState) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		ctx.ContentType("css")
-		return MenuCSS("Register", state, ctx, []string{})
-	}
-}
-
-func GenerateLoginCSS(state *UserState) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		ctx.ContentType("css")
-		return MenuCSS("Login", state, ctx, []string{})
-	}
-}
-
 func (ue *UserEngine) ServeSystem() {
 	state := ue.state
 	web.Post("/register/(.*)", GenerateRegisterUser(state))
@@ -466,6 +452,6 @@ func (ue *UserEngine) ServeSystem() {
 	web.Post("/login", GenerateNoJavascriptMessage())
 	web.Get("/logout", GenerateLogoutCurrentUser(state))
 	web.Get("/confirm/(.*)", GenerateConfirmUser(state))
-	web.Get("/css/login.css", GenerateLoginCSS(state))
-	web.Get("/css/register.css", GenerateRegisterCSS(state))
+	//web.Get("/css/login.css", GenerateLoginCSS(state))
+	//web.Get("/css/register.css", GenerateRegisterCSS(state))
 }
