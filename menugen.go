@@ -115,6 +115,7 @@ func AddIfNotAdded(url string, currentMenuURL string, filteredMenuEntries *MenuE
 // TODO: Put one if these in each engine then combine them somehow
 // TODO: Check for the menyEntry.url first, then check the rights, not the other way around
 // TODO: Fix and refactor this one
+// TODO: Check the user status _once_, and the admin status _once_, then generate the menu
 func DynamicMenuFactoryGenerator(currentMenuURL string, menuEntries MenuEntries) TemplateValueGeneratorFactory {
 	return func(state *UserState) TemplateValueGenerator {
 		return func(ctx *web.Context) TemplateValues {
