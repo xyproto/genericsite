@@ -1,7 +1,9 @@
 genericsite
 ===========
 
-Generic website library with search and user administration
+Generic website library with search and user administration.
+
+Not the prettiest of libraries, it's part of an experiment in procedural generation of websites.
 
 Features
 ========
