@@ -28,7 +28,7 @@ func (state *UserState) AdminRights(ctx *web.Context) bool {
 	return false
 }
 
-func (ae *AdminEngine) ServePages(basecp BaseCP, tvg TemplateValueGenerator) {
+func (ae *AdminEngine) ServePages(basecp BaseCP, tvg TemplateValueGenerator) { //, menuEntries MenuEntries) {
 	state := ae.state
 
 	adminCP := basecp(state)
@@ -235,33 +235,33 @@ func GenerateAllUsernames(state *UserState) SimpleContextHandle {
 	}
 }
 
-func GenerateGetCookie(state *UserState) SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		if !state.AdminRights(ctx) {
-			return MessageOKback("Get cookie", "Not logged in as Administrator")
-		}
-		username := GetBrowserUsername(ctx)
-		return MessageOKback("Get cookie", "Cookie: username = "+username)
-	}
-}
-
-func GenerateSetCookie(state *UserState) WebHandle {
-	return func(ctx *web.Context, username string) string {
-		if !state.AdminRights(ctx) {
-			return MessageOKback("Set cookie", "Not logged in as Administrator")
-		}
-		if username == "" {
-			return MessageOKback("Set cookie", "Can't set cookie for empty username")
-		}
-		if !state.HasUser(username) {
-			return MessageOKback("Set cookie", "Can't store cookie for non-existsing user")
-		}
-		// Create a cookie that lasts for one hour,
-		// this is the equivivalent of a session for a given username
-		ctx.SetSecureCookiePath("user", username, 3600, "/")
-		return MessageOKback("Set cookie", "Cookie stored: user = "+username+".")
-	}
-}
+//func GenerateGetCookie(state *UserState) SimpleContextHandle {
+//	return func(ctx *web.Context) string {
+//		if !state.AdminRights(ctx) {
+//			return MessageOKback("Get cookie", "Not logged in as Administrator")
+//		}
+//		username := GetBrowserUsername(ctx)
+//		return MessageOKback("Get cookie", "Cookie: username = "+username)
+//	}
+//}
+//
+//func GenerateSetCookie(state *UserState) WebHandle {
+//	return func(ctx *web.Context, username string) string {
+//		if !state.AdminRights(ctx) {
+//			return MessageOKback("Set cookie", "Not logged in as Administrator")
+//		}
+//		if username == "" {
+//			return MessageOKback("Set cookie", "Can't set cookie for empty username")
+//		}
+//		if !state.HasUser(username) {
+//			return MessageOKback("Set cookie", "Can't store cookie for non-existsing user")
+//		}
+//		// Create a cookie that lasts for one hour,
+//		// this is the equivivalent of a session for a given username
+//		ctx.SetSecureCookiePath("user", username, 3600, "/")
+//		return MessageOKback("Set cookie", "Cookie stored: user = "+username+".")
+//	}
+//}
 
 func GenerateToggleAdmin(state *UserState) WebHandle {
 	return func(ctx *web.Context, username string) string {
@@ -288,32 +288,32 @@ func GenerateToggleAdmin(state *UserState) WebHandle {
 }
 
 // This is now deprecated. Keep it around only as a nice example of fixing user values that worked.
-func GenerateFixPassword(state *UserState) WebHandle {
-	return func(ctx *web.Context, username string) string {
-		if !state.AdminRights(ctx) {
-			return MessageOKback("Fix password", "Not logged in as Administrator")
-		}
-		if username == "" {
-			return MessageOKback("Fix password", "Can't fix empty username")
-		}
-		if !state.HasUser(username) {
-			return MessageOKback("Fix password", "Can't fix non-existing user")
-		}
-		password := ""
-		passwordHash, err := state.users.Get(username, "password")
-		if err != nil {
-			return MessageOKback("Fix password", "Could not retrieve password hash")
-		}
-		if strings.HasPrefix(passwordHash, "abc123") {
-			if strings.HasSuffix(passwordHash, "abc123") {
-				password = passwordHash[6 : len(passwordHash)-6]
-			}
-		}
-		newPasswordHash := HashPasswordVersion2(password)
-		state.users.Set(username, "password", newPasswordHash)
-		return MessageOKurl("Fix password", "Ok, upgraded the password hash for "+username+" to version 2.", "/admin")
-	}
-}
+//func GenerateFixPassword(state *UserState) WebHandle {
+//	return func(ctx *web.Context, username string) string {
+//		if !state.AdminRights(ctx) {
+//			return MessageOKback("Fix password", "Not logged in as Administrator")
+//		}
+//		if username == "" {
+//			return MessageOKback("Fix password", "Can't fix empty username")
+//		}
+//		if !state.HasUser(username) {
+//			return MessageOKback("Fix password", "Can't fix non-existing user")
+//		}
+//		password := ""
+//		passwordHash, err := state.users.Get(username, "password")
+//		if err != nil {
+//			return MessageOKback("Fix password", "Could not retrieve password hash")
+//		}
+//		if strings.HasPrefix(passwordHash, "abc123") {
+//			if strings.HasSuffix(passwordHash, "abc123") {
+//				password = passwordHash[6 : len(passwordHash)-6]
+//			}
+//		}
+//		newPasswordHash := HashPasswordVersion2(password)
+//		state.users.Set(username, "password", newPasswordHash)
+//		return MessageOKurl("Fix password", "Ok, upgraded the password hash for "+username+" to version 2.", "/admin")
+//	}
+//}
 
 func (ae *AdminEngine) ServeSystem() {
 	state := ae.state
@@ -329,7 +329,7 @@ func (ae *AdminEngine) ServeSystem() {
 	web.Get("/admintoggle/(.*)", GenerateToggleAdmin(state))
 	//web.Get("/cookie/get", GenerateGetCookie(state))
 	//web.Get("/cookie/set/(.*)", GenerateSetCookie(state))
-	web.Get("/fixpassword/(.*)", GenerateFixPassword(state))
+	//web.Get("/fixpassword/(.*)", GenerateFixPassword(state))
 }
 
 func (ae *AdminEngine) GenerateCSS(cs *ColorScheme) SimpleContextHandle {

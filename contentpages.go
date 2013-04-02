@@ -213,6 +213,18 @@ a:link {color:` + cs.Menu_link + `;}
 a:visited {color:` + cs.Menu_link + `;}
 a:hover {color:` + cs.Menu_hover + `;}
 a:active {color:` + cs.Menu_active + `;}
+.menuEntry {
+	display: inline;
+}
+.menuList {
+	list-style-type: none;
+	float: left;
+	margin: 0;
+}
+.separator {
+	display: inline;
+	color: #a0a0a0;
+}
 `
 		// The load order of background-color, background-size and background-image
 		// is actually significant in Chrome! Do not reorder lightly!

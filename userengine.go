@@ -399,7 +399,7 @@ func (state *UserState) SetBrowserUsername(ctx *web.Context, username string, ti
 
 func GenerateNoJavascriptMessage() SimpleContextHandle {
 	return func(ctx *web.Context) string {
-		return MessageOKback("JavaScript error", "Logging in without cookies and javascript enabled, in a modern browser, is not yet supported.<br />Elinks will be supported in the future.")
+		return MessageOKback("JavaScript error", "Cookies and Javascrit must be enabled.<br />Older browsers might be supported in the future.")
 	}
 }
 
@@ -418,11 +418,10 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp.ContentTitle = "Login"
 	cp.ContentHTML = LoginForm()
 	cp.ContentJS += OnClick("#loginButton", "$('#loginForm').get(0).setAttribute('action', '/login/' + $('#username').val());")
-	cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/login.css")
+	//cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/login.css")
 	cp.Url = url
 
 	// Hide the Login menu if we're on the Login page
-	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuLogin", "menuNop", 1)
 	//cp.ContentJS += Hide("#menuLogin")
 
@@ -438,7 +437,6 @@ func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp.Url = url
 
 	// Hide the Register menu if we're on the Register page
-	// TODO: Replace with the entire Javascript expression, not just menuNop?
 	//cp.HeaderJS = strings.Replace(cp.HeaderJS, "menuRegister", "menuNop", 1)
 	//cp.ContentJS += Hide("#menuRegister")
 
@@ -452,6 +450,4 @@ func (ue *UserEngine) ServeSystem() {
 	web.Post("/login", GenerateNoJavascriptMessage())
 	web.Get("/logout", GenerateLogoutCurrentUser(state))
 	web.Get("/confirm/(.*)", GenerateConfirmUser(state))
-	//web.Get("/css/login.css", GenerateLoginCSS(state))
-	//web.Get("/css/register.css", GenerateRegisterCSS(state))
 }
