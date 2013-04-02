@@ -28,7 +28,7 @@ func (state *UserState) AdminRights(ctx *web.Context) bool {
 	return false
 }
 
-func (ae *AdminEngine) ServePages(basecp BaseCP, tvg TemplateValueGenerator) { //, menuEntries MenuEntries) {
+func (ae *AdminEngine) ServePages(basecp BaseCP, menuEntries MenuEntries) {
 	ae.serveSystem()
 
 	state := ae.state
@@ -37,7 +37,10 @@ func (ae *AdminEngine) ServePages(basecp BaseCP, tvg TemplateValueGenerator) { /
 	adminCP.ContentTitle = "Admin"
 	adminCP.ExtraCSSurls = append(adminCP.ExtraCSSurls, "/css/admin.css")
 
-	web.Get("/admin", adminCP.WrapSimpleContextHandle(GenerateAdminStatus(state), tvg))
+	// template content generator
+	tpvf := DynamicMenuFactoryGenerator(menuEntries)
+
+	web.Get("/admin", adminCP.WrapSimpleContextHandle(GenerateAdminStatus(state), tpvf(state)))
 	web.Get("/css/admin.css", ae.GenerateCSS(adminCP.ColorScheme))
 }
 
@@ -50,7 +53,7 @@ func GenerateAdminStatus(state *UserState) SimpleContextHandle {
 		}
 
 		// TODO: List all sorts of info, edit users, etc
-		s := "<h2>Welcome chief</h2>"
+		s := "<h2>Administrator Dashboard</h2>"
 
 		s += "<strong>User table</strong><br />"
 		s += "<table class=\"whitebg\">"
@@ -59,8 +62,12 @@ func GenerateAdminStatus(state *UserState) SimpleContextHandle {
 		s += "</tr>"
 		usernames, err := state.usernames.GetAll()
 		if err == nil {
-			for _, username := range usernames {
-				s += "<tr>"
+			for rownr, username := range usernames {
+				if rownr % 2 == 0 {
+					s += "<tr class=\"even\">"
+				} else {
+					s += "<tr class=\"odd\">"
+				}
 				s += "<td><a class=\"username\" href=\"/status/" + username + "\">" + username + "</a></td>"
 				s += TableCell(state.IsConfirmed(username))
 				s += TableCell(state.IsLoggedIn(username))
@@ -337,11 +344,17 @@ func (ae *AdminEngine) serveSystem() {
 func (ae *AdminEngine) GenerateCSS(cs *ColorScheme) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		ctx.ContentType("css")
+		// TODO: Consider if menus should be hidden this way when visiting a subpage
+		//#menuAdmin {
+		//	display: none;
+		//}
 		return `
-#menuAdmin {
-	display: none;
+.even {
+	background-color: "a0a0a0;
 }
-
+.odd {
+	background-color: #f0f0f0;
+}
 .yes {
 	background-color: #90ff90;
 	color: black;

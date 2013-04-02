@@ -88,7 +88,7 @@ func DefaultCP(userState *UserState) *ContentPage {
 
 	// http://wptheming.wpengine.netdna-cdn.com/wp-content/uploads/2010/04/gray-texture.jpg
 	// TODO: Draw these two backgroundimages with a canvas instead
-	cp.BackgroundTextureURL = "/img/gray.jpg"
+	cp.BackgroundTextureURL = "" // "/img/gray.jpg"
 	// http://turbo.designwoop.com/uploads/2012/03/16_free_subtle_textures_subtle_dark_vertical.jpg
 	cp.DarkBackgroundTextureURL = "/img/darkgray.jpg"
 

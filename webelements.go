@@ -23,20 +23,22 @@ func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgro
 	div.AddStyle("padding", "0 0 1em 0")
 	div.AddStyle("top", "0")
 	div.AddStyle("left", "0")
-	div.AddStyle("background-color", cs.Darkgray)
+	//div.AddStyle("background-color", cs.Darkgray)
 	div.AddStyle("position", "fixed")
 	div.AddStyle("display", "block")
 
 	titlebox := AddTitleBox(div, title, subtitle, cs)
 	titlebox.AddAttr("id", "titlebox")
 	titlebox.AddStyle("margin", "0 0 0 0")
-	// Padding-top + height should be 5em, padding decides the position
-	titlebox.AddStyle("padding", "1.8em 0 0 2.8em")
-	titlebox.AddStyle("height", "3.2em")
+	// Padding-top + height should be about 5em, padding decides the position
+	titlebox.AddStyle("padding", "1.2em 0 0 1.8em")
+	titlebox.AddStyle("height", "3.1em")
 	titlebox.AddStyle("width", "100%")
 	titlebox.AddStyle("position", "fixed")
-	titlebox.AddStyle("background-color", cs.Darkgray) // gray, could be a gradient
-	titlebox.AddStyle("background", "url('"+backgroundTextureURL+"')")
+	//titlebox.AddStyle("background-color", cs.Darkgray) // gray, could be a gradient
+	//if backgroundTextureURL != "" {
+	//	titlebox.AddStyle("background", "url('"+backgroundTextureURL+"')")
+	//}
 	//titlebox.AddStyle("z-index", "2") // 2 is above the search box which is 1
 
 	searchbox := AddSearchBox(titlebox, searchURL, searchButtonText, roundedLook)
@@ -44,7 +46,7 @@ func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgro
 	searchbox.AddStyle("position", "relative")
 	searchbox.AddStyle("float", "right")
 	// The padding decides the position for this one
-	searchbox.AddStyle("padding", "0 5em 0 0")
+	searchbox.AddStyle("padding", "0.4em 3em 0 0")
 	searchbox.AddStyle("margin", "0")
 	//searchbox.AddStyle("min-width", "10em")
 	//searchbox.AddStyle("line-height", "10em")
@@ -247,7 +249,7 @@ func AddMenuBox(page *Page, darkBackgroundTexture string) (*Tag, error) {
 	div.AddStyle("margin", "0")
 	div.AddStyle("padding", "0.1em 0 0.2em 0")
 	div.AddStyle("position", "absolute")
-	div.AddStyle("top", "5em")
+	div.AddStyle("top", "4.3em")
 	div.AddStyle("left", "0")
 	div.AddStyle("background-color", "#0c0c0c") // dark gray, fallback
 	div.AddStyle("background", "url('"+darkBackgroundTexture+"')")

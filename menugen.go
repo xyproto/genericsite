@@ -94,14 +94,14 @@ func HasEntry(checkEntry *MenuEntry, menuEntries MenuEntries) bool {
 	return false
 }
 
-func AddIfNotAdded(url string, currentMenuURL string, filteredMenuEntries *MenuEntries, menuEntry *MenuEntry) {
-	if currentMenuURL != url {
-		if menuEntry.url == url {
-			if !HasEntry(menuEntry, *filteredMenuEntries) {
-				*filteredMenuEntries = append(*filteredMenuEntries, menuEntry)
-			}
+func AddIfNotAdded(url string, filteredMenuEntries *MenuEntries, menuEntry *MenuEntry) {
+	//if currentMenuURL != url {
+	if menuEntry.url == url {
+		if !HasEntry(menuEntry, *filteredMenuEntries) {
+			*filteredMenuEntries = append(*filteredMenuEntries, menuEntry)
 		}
 	}
+	//}
 }
 
 
@@ -116,7 +116,7 @@ func AddIfNotAdded(url string, currentMenuURL string, filteredMenuEntries *MenuE
 // TODO: Check for the menyEntry.url first, then check the rights, not the other way around
 // TODO: Fix and refactor this one
 // TODO: Check the user status _once_, and the admin status _once_, then generate the menu
-func DynamicMenuFactoryGenerator(currentMenuURL string, menuEntries MenuEntries) TemplateValueGeneratorFactory {
+func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGeneratorFactory {
 	return func(state *UserState) TemplateValueGenerator {
 		return func(ctx *web.Context) TemplateValues {
 
@@ -140,7 +140,7 @@ func DynamicMenuFactoryGenerator(currentMenuURL string, menuEntries MenuEntries)
 				}
 
 				// Always show the Overview menu
-				AddIfNotAdded("/", currentMenuURL, &filteredMenuEntries, menuEntry)
+				AddIfNotAdded("/", &filteredMenuEntries, menuEntry)
 				//if menuEntry.url == "/" {
 				//	if !HasEntry(menuEntry, filteredMenuEntries) {
 				//		filteredMenuEntries = append(filteredMenuEntries, menuEntry)
@@ -151,28 +151,28 @@ func DynamicMenuFactoryGenerator(currentMenuURL string, menuEntries MenuEntries)
 				if state.UserRights(ctx) {
 
 					// Add every link except the current page we're on
-					if menuEntry.url != currentMenuURL {
-						if !HasEntry(menuEntry, filteredMenuEntries) {
-							if (menuEntry.url != "/login") && (menuEntry.url != "/register") {
-								filteredMenuEntries = append(filteredMenuEntries, menuEntry)
-							}
+					//if menuEntry.url != currentMenuURL {
+					if !HasEntry(menuEntry, filteredMenuEntries) {
+						if (menuEntry.url != "/login") && (menuEntry.url != "/register") && (menuEntry.url != "/admin") {
+							filteredMenuEntries = append(filteredMenuEntries, menuEntry)
 						}
 					}
+					//}
 
 					// Show admin content
 					if state.AdminRights(ctx) {
-						AddIfNotAdded("/admin", currentMenuURL, &filteredMenuEntries, menuEntry)
+						AddIfNotAdded("/admin", &filteredMenuEntries, menuEntry)
 					}
 				} else {
 					// Only show Login and Register
-					AddIfNotAdded("/login", currentMenuURL, &filteredMenuEntries, menuEntry)
-					AddIfNotAdded("/register", currentMenuURL, &filteredMenuEntries, menuEntry)
+					AddIfNotAdded("/login", &filteredMenuEntries, menuEntry)
+					AddIfNotAdded("/register", &filteredMenuEntries, menuEntry)
 				}
 
 			}
 
 			if logoutEntry != nil {
-				AddIfNotAdded("/logout", "", &filteredMenuEntries, logoutEntry)
+				AddIfNotAdded("/logout", &filteredMenuEntries, logoutEntry)
 			}
 
 			page := MenuSnippet(filteredMenuEntries)
