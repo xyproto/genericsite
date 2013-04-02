@@ -29,6 +29,8 @@ func (state *UserState) AdminRights(ctx *web.Context) bool {
 }
 
 func (ae *AdminEngine) ServePages(basecp BaseCP, tvg TemplateValueGenerator) { //, menuEntries MenuEntries) {
+	ae.serveSystem()
+
 	state := ae.state
 
 	adminCP := basecp(state)
@@ -315,7 +317,7 @@ func GenerateToggleAdmin(state *UserState) WebHandle {
 //	}
 //}
 
-func (ae *AdminEngine) ServeSystem() {
+func (ae *AdminEngine) serveSystem() {
 	state := ae.state
 
 	// These are available for everyone
