@@ -120,6 +120,9 @@ func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGenerator
 	return func(state *UserState) TemplateValueGenerator {
 		return func(ctx *web.Context) TemplateValues {
 
+			userRights := state.UserRights(ctx)
+			adminRights := state.AdminRights(ctx)
+
 			var filteredMenuEntries MenuEntries
 			var logoutEntry *MenuEntry = nil
 
@@ -133,7 +136,7 @@ func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGenerator
 
 				// Add this one last
 				if menuEntry.url == "/logout" {
-					if state.UserRights(ctx) {
+					if userRights {
 						logoutEntry = menuEntry
 					}
 					continue
@@ -148,7 +151,7 @@ func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGenerator
 				//}
 
 				// If logged in, show Logout and the content
-				if state.UserRights(ctx) {
+				if userRights {
 
 					// Add every link except the current page we're on
 					//if menuEntry.url != currentMenuURL {
@@ -160,7 +163,7 @@ func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGenerator
 					//}
 
 					// Show admin content
-					if state.AdminRights(ctx) {
+					if adminRights {
 						AddIfNotAdded("/admin", &filteredMenuEntries, menuEntry)
 					}
 				} else {
