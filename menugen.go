@@ -8,9 +8,9 @@ import (
 )
 
 type MenuEntry struct {
-	id string
+	id   string
 	text string
-	url string
+	url  string
 }
 
 type MenuEntries []*MenuEntry
@@ -103,7 +103,6 @@ func AddIfNotAdded(url string, filteredMenuEntries *MenuEntries, menuEntry *Menu
 	}
 	//}
 }
-
 
 /* 
  * Functions that generate functions that generate content that can be used in templates.

@@ -15,6 +15,11 @@ Features
 * Subpages
 * Native speed
 
+TODO
+====
+
+* Move the login and register forms back here from browserspeak
+
 License
 =======
 

@@ -160,4 +160,3 @@ func ServeSearchPages(basecp BaseCP, state *UserState, cps PageCollection, cs *C
 	web.Get("/search(.*)", searchCP.WrapWebHandle(GenerateSearchHandle(cps), tpg))
 	web.Get("/css/search.css", GenerateSearchCSS(cs))
 }
-

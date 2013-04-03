@@ -1,8 +1,8 @@
 package genericsite
 
 import (
-	"time"
 	"strings"
+	"time"
 
 	"github.com/drbawb/mustache"
 	. "github.com/xyproto/browserspeak"
@@ -176,7 +176,6 @@ func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tvgf T
 	}
 }
 
-
 // Some Engines like Admin must be served separately
 // JQuery is at 1.9.1 at the time of writing
 func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jqueryversion string) {
@@ -234,7 +233,7 @@ a:active {color:` + cs.Menu_active + `;}
 			retval = "body {\nbackground-color: " + cs.Default_background + ";\n}\n" + retval
 		}
 		//retval += MenuCSS(currentMenuID, state, ctx, usercontent)
-		retval += ".titletext { display: inline; }";
+		retval += ".titletext { display: inline; }"
 		return retval
 	}
 }

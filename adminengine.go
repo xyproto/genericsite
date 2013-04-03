@@ -63,7 +63,7 @@ func GenerateAdminStatus(state *UserState) SimpleContextHandle {
 		usernames, err := state.usernames.GetAll()
 		if err == nil {
 			for rownr, username := range usernames {
-				if rownr % 2 == 0 {
+				if rownr%2 == 0 {
 					s += "<tr class=\"even\">"
 				} else {
 					s += "<tr class=\"odd\">"
