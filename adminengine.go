@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	. "github.com/xyproto/browserspeak"
-	"github.com/xyproto/web"
 	"github.com/xyproto/instapage"
+	"github.com/xyproto/web"
 )
 
 // This part handles the "admin" pages

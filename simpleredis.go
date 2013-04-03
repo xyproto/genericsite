@@ -171,7 +171,7 @@ func (rl *RedisList) GetLast() (string, error) {
 // Get the last N values of a redis list
 func (rl *RedisList) GetLastN(n int) ([]string, error) {
 	conn := rl.pool.Get()
-	result, err := redis.Values(conn.Do("LRANGE", rl.id, "-" + strconv.Itoa(n), "-1"))
+	result, err := redis.Values(conn.Do("LRANGE", rl.id, "-"+strconv.Itoa(n), "-1"))
 	strs := make([]string, len(result))
 	for i := 0; i < len(result); i++ {
 		strs[i] = getString(result, i)
