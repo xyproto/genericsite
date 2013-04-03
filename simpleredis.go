@@ -1,10 +1,12 @@
 package genericsite
 
 import (
+	"strconv"
+
 	"github.com/garyburd/redigo/redis"
 )
 
-// Functions for dealing with a just a few string values in Redis
+// Functions for dealing with string values in a simple fashion in Redis
 
 type ConnectionPool redis.Pool
 
@@ -86,7 +88,6 @@ func (rs *RedisSet) GetAll() ([]string, error) {
 		strs[i] = getString(result, i)
 	}
 	return strs, err
-
 }
 
 func (rs *RedisSet) Del(value string) error {
@@ -99,6 +100,10 @@ func (rl *RedisList) Store(value string) error {
 	conn := rl.pool.Get()
 	_, err := conn.Do("RPUSH", rl.id, value)
 	return err
+}
+
+func (rl *RedisList) Add(value string) error {
+	return rl.Store(value)
 }
 
 func (rm *RedisKeyValue) Set(key, value string) error {
@@ -137,15 +142,11 @@ func (rh *RedisHashMap) Del(hashkey, key string) error {
 	return err
 }
 
-func bytes2string(b []uint8) string {
-	return string(b)
-	//return bytes.NewBuffer(b).String()
-}
-
 func getString(bi []interface{}, i int) string {
 	return string(bi[i].([]uint8))
 }
 
+// Get all elements of a redis list
 func (rl *RedisList) GetAll() ([]string, error) {
 	conn := rl.pool.Get()
 	result, err := redis.Values(conn.Do("LRANGE", rl.id, "0", "-1"))
@@ -156,6 +157,7 @@ func (rl *RedisList) GetAll() ([]string, error) {
 	return strs, err
 }
 
+// Get the last element of a redis list
 func (rl *RedisList) GetLast() (string, error) {
 	conn := rl.pool.Get()
 	result, err := redis.Values(conn.Do("LRANGE", rl.id, "-1", "-1"))
@@ -165,6 +167,18 @@ func (rl *RedisList) GetLast() (string, error) {
 	return "", err
 }
 
+// Get the last N values of a redis list
+func (rl *RedisList) GetLastN(n int) ([]string, error) {
+	conn := rl.pool.Get()
+	result, err := redis.Values(conn.Do("LRANGE", rl.id, "-" + strconv.Itoa(n), "-1"))
+	strs := make([]string, len(result))
+	for i := 0; i < len(result); i++ {
+		strs[i] = getString(result, i)
+	}
+	return strs, err
+}
+
+// Delete a redis list
 func (rl *RedisList) DelAll() error {
 	conn := rl.pool.Get()
 	_, err := conn.Do("DEL", rl.id)

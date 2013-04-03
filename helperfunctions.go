@@ -66,3 +66,7 @@ func RandomCookieFriendlyString(length int) string {
 	}
 	return string(b)
 }
+
+func CleanUpUserInput(val string) string {
+	return strings.Replace(val, "<", "&lt;", -1)
+}

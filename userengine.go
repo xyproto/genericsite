@@ -1,6 +1,6 @@
 package genericsite
 
-// OK, only user-related stuff, 23-03-13
+// TODO: Consider using "0" and "1" instead of "true" or "false" when setting values, while still understanding "true" or "false"
 
 import (
 	"crypto/sha256"
@@ -12,6 +12,7 @@ import (
 
 	. "github.com/xyproto/browserspeak"
 	"github.com/xyproto/web"
+	"github.com/xyproto/instapage"
 )
 
 type UserState struct {
@@ -87,16 +88,28 @@ func AddUserUnchecked(state *UserState, username, password, email string) {
 	}
 }
 
-func (state *UserState) IsConfirmed(username string) bool {
+func (state *UserState) GetBooleanField(username, fieldname string) bool {
 	hasUser := state.HasUser(username)
 	if !hasUser {
 		return false
 	}
-	confirmed, err := state.users.Get(username, "confirmed")
+	chatting, err := state.users.Get(username, fieldname)
 	if err != nil {
 		return false
 	}
-	return TruthValue(confirmed)
+	return TruthValue(chatting)
+}
+
+func (state *UserState) SetBooleanField(username, fieldname string, val bool) {
+	strval := "false"
+	if val {
+		strval = "true"
+	}
+	state.users.Set(username, fieldname, strval)
+}
+
+func (state *UserState) IsConfirmed(username string) bool {
+	return state.GetBooleanField(username, "confirmed")
 }
 
 func CorrectPassword(state *UserState, username, password string) bool {
@@ -107,9 +120,6 @@ func CorrectPassword(state *UserState, username, password string) bool {
 	if hashedPassword == HashPasswordVersion2(password) {
 		return true
 	}
-	//if hashedPassword == HashPasswordVersion1(password) {
-	//	return true
-	//}
 	return false
 }
 
@@ -150,7 +160,7 @@ func GenerateConfirmUser(state *UserState) WebHandle {
 
 		unconfirmedUsernames, err := state.unconfirmed.GetAll()
 		if err != nil {
-			return MessageOKurl("Confirmation", "All users are confirmed already.", "/register")
+			return instapage.MessageOKurl("Confirmation", "All users are confirmed already.", "/register")
 		}
 
 		// Find the username by looking up the confirmationCode on unconfirmed users
@@ -171,11 +181,11 @@ func GenerateConfirmUser(state *UserState) WebHandle {
 		// Check that the user is there
 		if username == "" {
 			// Say "no longer" because we don't care about people that just try random confirmation links
-			return MessageOKurl("Confirmation", "The confirmation link is no longer valid.", "/register")
+			return instapage.MessageOKurl("Confirmation", "The confirmation link is no longer valid.", "/register")
 		}
 		hasUser := state.HasUser(username)
 		if !hasUser {
-			return MessageOKurl("Confirmation", "The user you wish to confirm does not exist anymore.", "/register")
+			return instapage.MessageOKurl("Confirmation", "The user you wish to confirm does not exist anymore.", "/register")
 		}
 
 		// Remove from the list of unconfirmed usernames
@@ -186,7 +196,7 @@ func GenerateConfirmUser(state *UserState) WebHandle {
 		// Mark user as confirmed
 		state.users.Set(username, "confirmed", "true")
 
-		return MessageOKurl("Confirmation", "Thank you "+username+", you can now log in.", "/login")
+		return instapage.MessageOKurl("Confirmation", "Thank you "+username+", you can now log in.", "/login")
 	}
 }
 
@@ -196,20 +206,20 @@ func GenerateLoginUser(state *UserState) WebHandle {
 		// Fetch password from ctx
 		password, found := ctx.Params["password"]
 		if !found {
-			return MessageOKback("Login", "Can't log in without a password.")
+			return instapage.MessageOKback("Login", "Can't log in without a password.")
 		}
 		username := val
 		if username == "" {
-			return MessageOKback("Login", "Can't log in with a blank username.")
+			return instapage.MessageOKback("Login", "Can't log in with a blank username.")
 		}
 		if !state.HasUser(username) {
-			return MessageOKback("Login", "User "+username+" does not exist, could not log in.")
+			return instapage.MessageOKback("Login", "User "+username+" does not exist, could not log in.")
 		}
 		if !state.IsConfirmed(username) {
-			return MessageOKback("Login", "The email for "+username+" has not been confirmed, check your email and follow the link.")
+			return instapage.MessageOKback("Login", "The email for "+username+" has not been confirmed, check your email and follow the link.")
 		}
 		if !CorrectPassword(state, username, password) {
-			return MessageOKback("Login", "Wrong password.")
+			return instapage.MessageOKback("Login", "Wrong password.")
 		}
 
 		// Log in the user by changing the database and setting a secure cookie
@@ -257,33 +267,33 @@ func GenerateRegisterUser(state *UserState) WebHandle {
 		// Password checks
 		password1, found := ctx.Params["password1"]
 		if password1 == "" || !found {
-			return MessageOKback("Register", "Can't register without a password.")
+			return instapage.MessageOKback("Register", "Can't register without a password.")
 		}
 		password2, found := ctx.Params["password2"]
 		if password2 == "" || !found {
-			return MessageOKback("Register", "Please confirm the password by typing it in twice.")
+			return instapage.MessageOKback("Register", "Please confirm the password by typing it in twice.")
 		}
 		if password1 != password2 {
-			return MessageOKback("Register", "The password and confirmation password must be equal.")
+			return instapage.MessageOKback("Register", "The password and confirmation password must be equal.")
 		}
 
 		// Email checks
 		email, found := ctx.Params["email"]
 		if !found {
-			return MessageOKback("Register", "Can't register without an email address.")
+			return instapage.MessageOKback("Register", "Can't register without an email address.")
 		}
 		// must have @ and ., but no " "
 		if !strings.Contains(email, "@") || !strings.Contains(email, ".") || strings.Contains(email, " ") {
-			return MessageOKback("Register", "Please use a valid email address.")
+			return instapage.MessageOKback("Register", "Please use a valid email address.")
 		}
 
 		// Username checks
 		username := val
 		if username == "" {
-			return MessageOKback("Register", "Can't register without a username.")
+			return instapage.MessageOKback("Register", "Can't register without a username.")
 		}
 		if state.HasUser(username) {
-			return MessageOKback("Register", "That user already exists, try another username.")
+			return instapage.MessageOKback("Register", "That user already exists, try another username.")
 		}
 
 		// Only some letters are allowed in the username
@@ -294,10 +304,10 @@ func GenerateRegisterUser(state *UserState) WebHandle {
 					continue NEXT
 				}
 			}
-			return MessageOKback("Register", "Only a-å, A-Å, 0-9 and _ are allowed in usernames.")
+			return instapage.MessageOKback("Register", "Only a-å, A-Å, 0-9 and _ are allowed in usernames.")
 		}
 		if username == password1 {
-			return MessageOKback("Register", "Username and password must be different, try another password.")
+			return instapage.MessageOKback("Register", "Username and password must be different, try another password.")
 		}
 
 		adminuser := false
@@ -340,7 +350,7 @@ func GenerateRegisterUser(state *UserState) WebHandle {
 
 		// Redirect
 		//ctx.SetHeader("Refresh", "0; url=/login", true)
-		return MessageOKurl("Registration complete", "Thanks for registering, the confirmation e-mail has been sent.", "/login")
+		return instapage.MessageOKurl("Registration complete", "Thanks for registering, the confirmation e-mail has been sent.", "/login")
 	}
 }
 
@@ -349,10 +359,10 @@ func GenerateLogoutCurrentUser(state *UserState) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		username := GetBrowserUsername(ctx)
 		if username == "" {
-			return MessageOKback("Logout", "No user to log out")
+			return instapage.MessageOKback("Logout", "No user to log out")
 		}
 		if !state.HasUser(username) {
-			return MessageOKback("Logout", "user "+username+" does not exist, could not log out")
+			return instapage.MessageOKback("Logout", "user "+username+" does not exist, could not log out")
 		}
 
 		// Log out the user by changing the database, the cookie can stay
@@ -360,7 +370,7 @@ func GenerateLogoutCurrentUser(state *UserState) SimpleContextHandle {
 
 		// Redirect
 		//ctx.SetHeader("Refresh", "0; url=/login", true)
-		return MessageOKurl("Logout", username+" is now logged out. Hope to see you soon!", "/login")
+		return instapage.MessageOKurl("Logout", username+" is now logged out. Hope to see you soon!", "/login")
 	}
 }
 
@@ -399,7 +409,7 @@ func (state *UserState) SetBrowserUsername(ctx *web.Context, username string, ti
 
 func GenerateNoJavascriptMessage() SimpleContextHandle {
 	return func(ctx *web.Context) string {
-		return MessageOKback("JavaScript error", "Cookies and Javascrit must be enabled.<br />Older browsers might be supported in the future.")
+		return instapage.MessageOKback("JavaScript error", "Cookies and Javascriåt must be enabled.<br />Older browsers might be supported in the future.")
 	}
 }
 
@@ -416,7 +426,7 @@ func createUserState(pool *ConnectionPool) *UserState {
 func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp := basecp(state)
 	cp.ContentTitle = "Login"
-	cp.ContentHTML = LoginForm()
+	cp.ContentHTML = instapage.LoginForm()
 	cp.ContentJS += OnClick("#loginButton", "$('#loginForm').get(0).setAttribute('action', '/login/' + $('#username').val());")
 	//cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/login.css")
 	cp.Url = url
@@ -431,7 +441,7 @@ func LoginCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 func RegisterCP(basecp BaseCP, state *UserState, url string) *ContentPage {
 	cp := basecp(state)
 	cp.ContentTitle = "Register"
-	cp.ContentHTML = RegisterForm()
+	cp.ContentHTML = instapage.RegisterForm()
 	cp.ContentJS += OnClick("#registerButton", "$('#registerForm').get(0).setAttribute('action', '/register/' + $('#username').val());")
 	//cp.ExtraCSSurls = append(cp.ExtraCSSurls, "/css/register.css")
 	cp.Url = url
