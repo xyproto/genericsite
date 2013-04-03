@@ -7,6 +7,7 @@ import (
 )
 
 // Functions for dealing with string values in a simple fashion in Redis
+// TODO: Split out as a separate package
 
 type ConnectionPool redis.Pool
 
