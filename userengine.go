@@ -41,7 +41,7 @@ type UserEngine struct {
 
 func NewUserEngine(pool *ConnectionPool) *UserEngine {
 	// For the secure cookies
-	// This must happen before the random seeding, or 
+	// This must happen before the random seeding, or
 	// else people will have to log in again after every server restart
 	web.Config.CookieSecret = RandomCookieFriendlyString(30)
 
