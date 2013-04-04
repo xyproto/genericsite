@@ -16,6 +16,7 @@ import (
 	. "github.com/xyproto/browserspeak"
 	"github.com/xyproto/instapage"
 	"github.com/xyproto/web"
+	. "github.com/xyproto/simpleredis"
 )
 
 type UserState struct {

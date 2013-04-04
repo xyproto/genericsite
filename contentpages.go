@@ -7,6 +7,7 @@ import (
 	"github.com/drbawb/mustache"
 	. "github.com/xyproto/browserspeak"
 	"github.com/xyproto/web"
+	"github.com/xyproto/simpleredis"
 )
 
 type ContentPage struct {
@@ -281,5 +282,5 @@ func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tvg Temp
 
 func InitSystem() *ConnectionPool {
 	// Create a Redis connection pool
-	return NewRedisConnectionPool()
+	return simpleredis.NewRedisConnectionPool()
 }
