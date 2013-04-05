@@ -142,7 +142,7 @@ func genericPageBuilder(cp *ContentPage) *Page {
 
 	AddMenuBox(page, cp.DarkBackgroundTextureURL)
 
-	AddContent(page, cp.ContentTitle, cp.ContentHTML+BodyJS(cp.ContentJS))
+	AddContent(page, cp.ContentTitle, cp.ContentHTML+DocumentReadyJS(cp.ContentJS))
 
 	elapsed := time.Since(startTime)
 	AddFooter(page, cp.FooterText, cp.FooterTextColor, cp.FooterColor, elapsed)
