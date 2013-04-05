@@ -78,7 +78,7 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cp.ExtraCSSurls = []string{"/css/menu.css"}
 	// TODO: fallback to local jquery.min.js, google how
 	cp.JqueryJSurl = "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" // "/js/jquery-1.9.1.js"
-	cp.Faviconurl = "/favicon.ico"
+	cp.Faviconurl = "/img/favicon.ico"
 	cp.Links = []string{"Overview:/", "Login:/login", "Logout:/logout", "Register:/register", "Admin:/admin"}
 	cp.ContentTitle = "NOP"
 	cp.ContentHTML = "NOP NOP NOP"
@@ -195,7 +195,9 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf Tem
 	// TODO: Generate these
 	Publish("/robots.txt", "static/various/robots.txt", false)
 	Publish("/sitemap_index.xml", "static/various/sitemap_index.xml", false)
-	Publish("/favicon.ico", "static/img/favicon.ico", false)
+
+	// Handled by the static part of web.go
+	//Publish("/favicon.ico", "static/img/favicon.ico", false)
 }
 
 // CSS for the menu, and a bit more
