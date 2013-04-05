@@ -104,7 +104,7 @@ func AddIfNotAdded(url string, filteredMenuEntries *MenuEntries, menuEntry *Menu
 	//}
 }
 
-/* 
+/*
  * Functions that generate functions that generate content that can be used in templates.
  * type TemplateValues map[string]string
  * type TemplateValueGenerator func(*web.Context) TemplateValues
