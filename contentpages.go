@@ -5,7 +5,6 @@ import (
 
 	"github.com/drbawb/mustache"
 	. "github.com/xyproto/browserspeak"
-	"github.com/xyproto/simpleredis"
 	"github.com/xyproto/web"
 )
 
@@ -44,15 +43,6 @@ type PageCollection []ContentPage
 // Every input from the user must be intitially stored in a UserInput variable, not in a string!
 // This is just to be aware of which data one should be careful with, and to keep it clean.
 type UserInput string
-
-// Engine is a sub-system, a collection of sub-pages, that can be served
-type Engine interface {
-	GetState() *UserState
-	SetState(*UserState)
-	GenerateCSS(*ColorScheme) SimpleContextHandle
-	ServePages(ContentPage)
-	ServeSystem()
-}
 
 type ColorScheme struct {
 	Darkgray           string
@@ -154,14 +144,8 @@ func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tvgf T
 // Some Engines like Admin must be served separately
 // JQuery is at 1.9.1 at the time of writing
 func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jqueryversion string) {
-	// Add pages for login, logout and register
-	cps = append(cps, *LoginCP(basecp, userState, "/login"))
-	cps = append(cps, *RegisterCP(basecp, userState, "/register"))
-
 	cs := basecp(userState).ColorScheme
 	PublishCPs(userState, cps, cs, tvgf, "/css/menu.css")
-
-	ServeSearchPages(basecp, userState, cps, cs, tvgf(userState))
 
 	// TODO: Add fallback to this local version
 	Publish("/js/jquery-"+jqueryversion+".js", "static/js/jquery-"+jqueryversion+".js", true)
@@ -169,9 +153,6 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf Tem
 	// TODO: Generate these
 	Publish("/robots.txt", "static/various/robots.txt", false)
 	Publish("/sitemap_index.xml", "static/various/sitemap_index.xml", false)
-
-	// Handled by the static part of web.go
-	//Publish("/favicon.ico", "static/img/favicon.ico", false)
 }
 
 // CSS for the menu, and a bit more
@@ -253,9 +234,4 @@ func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tvg Temp
 		web.Get(cp.GeneratedCSSurl, css)
 		return html
 	}
-}
-
-func InitSystem() *simpleredis.ConnectionPool {
-	// Create a Redis connection pool
-	return simpleredis.NewRedisConnectionPool()
 }
