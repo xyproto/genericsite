@@ -152,10 +152,6 @@ func ServeSearchPages(basecp BaseCP, state *UserState, cps PageCollection, cs *C
 	searchCP.ContentTitle = "Search results"
 	searchCP.ExtraCSSurls = append(searchCP.ExtraCSSurls, "/css/search.css")
 
-	// Hide the Search menu if we're on the Search page
-	//searchCP.ContentJS = Hide("#menuSearch")
-	searchCP.HiddenMenuIDs = append(searchCP.HiddenMenuIDs, "menuSearch")
-
 	// Note, no slash between "search" and "(.*)". A typical search is "/search?q=blabla"
 	web.Get("/search(.*)", searchCP.WrapWebHandle(GenerateSearchHandle(cps), tpg))
 	web.Get("/css/search.css", GenerateSearchCSS(cs))

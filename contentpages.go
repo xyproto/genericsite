@@ -1,7 +1,6 @@
 package genericsite
 
 import (
-	"strings"
 	"time"
 
 	"github.com/drbawb/mustache"
@@ -19,8 +18,6 @@ type ContentPage struct {
 	StretchBackground        bool
 	Title                    string
 	Subtitle                 string
-	Links                    []string
-	HiddenMenuIDs            []string
 	ContentTitle             string
 	ContentHTML              string
 	HeaderJS                 string
@@ -79,7 +76,6 @@ func DefaultCP(userState *UserState) *ContentPage {
 	// TODO: fallback to local jquery.min.js, google how
 	cp.JqueryJSurl = "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" // "/js/jquery-1.9.1.js"
 	cp.Faviconurl = "/img/favicon.ico"
-	cp.Links = []string{"Overview:/", "Login:/login", "Logout:/logout", "Register:/register", "Admin:/admin"}
 	cp.ContentTitle = "NOP"
 	cp.ContentHTML = "NOP NOP NOP"
 	cp.ContentJS = ""
@@ -112,10 +108,6 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cs.Menu_active = "#ffffff" // white
 	cs.Default_background = "#000030"
 	cp.ColorScheme = &cs
-
-	// TODO: Remove this, all menus are now hidden by default
-	// Menus that are hidden (not generated) by default
-	//cp.HiddenMenuIDs = []string{"menuLogin", "menuLogout", "menuRegister"}
 
 	return &cp
 }
@@ -155,25 +147,7 @@ func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tvgf T
 	// For each content page in the page collection
 	for _, cp := range pc {
 		// TODO: different css urls for all of these?
-
-		// Find the right link text
-		var menuID, firstword, text, url string
-		var usercontent []string
-		for _, textandurl := range cp.Links {
-			text, url = ColonSplit(textandurl)
-			firstword = text
-			if strings.Contains(text, " ") {
-				firstword = strings.SplitN(text, " ", 2)[0]
-			}
-			if url == cp.Url {
-				menuID = firstword
-			} else {
-				usercontent = append(usercontent, firstword)
-			}
-		}
-		// menuID will now be blank or correct
-
-		cp.Pub(menuID, userState, usercontent, cp.Url, cssurl, cs, tvgf(userState))
+		cp.Pub(userState, cp.Url, cssurl, cs, tvgf(userState))
 	}
 }
 
@@ -201,7 +175,7 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf Tem
 }
 
 // CSS for the menu, and a bit more
-func GenerateMenuCSS(currentMenuID string, state *UserState, usercontent []string, stretchBackground bool, cs *ColorScheme) SimpleContextHandle {
+func GenerateMenuCSS(state *UserState, stretchBackground bool, cs *ColorScheme) SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		ctx.ContentType("css")
 		// one of the extra css files that are loaded after the main style
@@ -229,24 +203,23 @@ a:active {color:` + cs.Menu_active + `;}
 }
 `
 		// The load order of background-color, background-size and background-image
-		// is actually significant in Chrome! Do not reorder lightly!
+		// is actually significant in some browsers! Do not reorder lightly.
 		if stretchBackground {
 			retval = "body {\nbackground-color: " + cs.Default_background + ";\nbackground-size: cover;\n}\n" + retval
 		} else {
 			retval = "body {\nbackground-color: " + cs.Default_background + ";\n}\n" + retval
 		}
-		//retval += MenuCSS(currentMenuID, state, ctx, usercontent)
 		retval += ".titletext { display: inline; }"
 		return retval
 	}
 }
 
 // Make an html and css page available
-func (cp *ContentPage) Pub(currentMenuID string, userState *UserState, usercontent []string, url, cssurl string, cs *ColorScheme, tvg TemplateValueGenerator) {
+func (cp *ContentPage) Pub(userState *UserState, url, cssurl string, cs *ColorScheme, tvg TemplateValueGenerator) {
 	genericpage := genericPageBuilder(cp)
 	web.Get(url, GenerateHTMLwithTemplate(genericpage, tvg))
 	web.Get(cp.GeneratedCSSurl, GenerateCSS(genericpage))
-	web.Get(cssurl, GenerateMenuCSS(currentMenuID, userState, usercontent, cp.StretchBackground, cs))
+	web.Get(cssurl, GenerateMenuCSS(userState, cp.StretchBackground, cs))
 }
 
 // TODO: Write a function for rendering a CowboyTag inside a Page by the use of template {{{placeholders}}
