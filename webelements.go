@@ -23,7 +23,7 @@ func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgro
 	div.AddStyle("padding", "0 0 1em 0")
 	div.AddStyle("top", "0")
 	div.AddStyle("left", "0")
-	//div.AddStyle("background-color", cs.Darkgray)
+	div.AddStyle("background-color", cs.Darkgray)
 	div.AddStyle("position", "fixed")
 	div.AddStyle("display", "block")
 
@@ -36,9 +36,9 @@ func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgro
 	titlebox.AddStyle("width", "100%")
 	titlebox.AddStyle("position", "fixed")
 	//titlebox.AddStyle("background-color", cs.Darkgray) // gray, could be a gradient
-	//if backgroundTextureURL != "" {
-	//	titlebox.AddStyle("background", "url('"+backgroundTextureURL+"')")
-	//}
+	if backgroundTextureURL != "" {
+		titlebox.AddStyle("background", "url('"+backgroundTextureURL+"')")
+	}
 	//titlebox.AddStyle("z-index", "2") // 2 is above the search box which is 1
 
 	searchbox := AddSearchBox(titlebox, searchURL, searchButtonText, roundedLook)
@@ -203,7 +203,7 @@ func AddTitleBox(tag *Tag, title, subtitle string, cs *ColorScheme) *Tag {
 	font0 := a.AddNewTag("div")
 	font0.AddAttr("id", "whitetitle")
 	font0.AddAttr("class", "titletext")
-	font0.AddStyle("color", "white")
+	font0.AddStyle("color", cs.TitleText)
 	//font0.CustomSansSerif("Armata")
 	font0.SansSerif()
 	font0.AddStyle("font-size", "2.0em")

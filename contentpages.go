@@ -51,6 +51,7 @@ type ColorScheme struct {
 	Menu_hover         string
 	Menu_active        string
 	Default_background string
+	TitleText          string
 }
 
 type BaseCP func(state *UserState) *ContentPage
@@ -97,6 +98,8 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cs.Menu_hover = "#efefe0"  // light gray, somewhat yellow
 	cs.Menu_active = "#ffffff" // white
 	cs.Default_background = "#000030"
+	cs.TitleText = "#303030"
+
 	cp.ColorScheme = &cs
 
 	return &cp
