@@ -152,7 +152,7 @@ func AddSearchBox(tag *Tag, actionURL, buttonText string, roundedLook bool) *Tag
 	inputText := innerDiv.AddNewTag("input")
 	inputText.AddAttr("id", "inputtext")
 	inputText.AddAttr("name", "q")
-	inputText.AddAttr("size", "25")
+	inputText.AddAttr("size", "40")
 	inputText.AddStyle("padding", "0.25em")
 	inputText.CustomSansSerif("Armata")
 	inputText.AddStyle("background-color", "#f0f0f0")
