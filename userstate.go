@@ -91,13 +91,13 @@ func (state *UserState) IsLoggedIn(username string) bool {
 // Checks if the current user is logged in as Administrator right now
 func (state *UserState) AdminRights(ctx *web.Context) bool {
 	if username := GetBrowserUsername(ctx); username != "" {
-		return state.IsLoggedIn(username) && state.IsAdministrator(username)
+		return state.IsLoggedIn(username) && state.IsAdmin(username)
 	}
 	return false
 }
 
 // Checks if the given username is an administrator
-func (state *UserState) IsAdministrator(username string) bool {
+func (state *UserState) IsAdmin(username string) bool {
 	if !state.HasUser(username) {
 		return false
 	}
