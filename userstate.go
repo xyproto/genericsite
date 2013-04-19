@@ -7,6 +7,10 @@ import (
 	"github.com/xyproto/web"
 )
 
+const (
+	LOGINCOOKIETIME = 3600 * 24 // The login cookie should last 24 hours
+)
+
 type UserState struct {
 	// see: http://redis.io/topics/data-types
 	users       *simpleredis.HashMap        // Hash map of users, with several different fields per user ("loggedin", "confirmed", "email" etc)
@@ -162,7 +166,7 @@ func (state *UserState) AddUnconfirmed(username, confirmationCode string) {
 // Remove a user that has registered but not confirmed
 func (state *UserState) RemoveUnconfirmed(username string) {
 	state.unconfirmed.Del(username)
-	state.users.Del(username, "confirmationCode")
+	state.users.DelKey(username, "confirmationCode")
 }
 
 func (state *UserState) MarkConfirmed(username string) {
@@ -172,7 +176,7 @@ func (state *UserState) MarkConfirmed(username string) {
 func (state *UserState) RemoveUser(username string) {
 	state.usernames.Del(username)
 	// Remove additional data as well
-	state.users.Del(username, "loggedin")
+	state.users.DelKey(username, "loggedin")
 }
 
 func (state *UserState) SetAdminStatus(username string) {
@@ -210,5 +214,5 @@ func (state *UserState) SetLoggedOut(username string) {
 // Get how long a login cookie should last
 func (state *UserState) GetCookieTimeout(username string) int64 {
 	// TODO: Store this in state.users
-	return 3600
+	return LOGINCOOKIETIME
 }
