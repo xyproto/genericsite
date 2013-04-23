@@ -65,7 +65,7 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cp.GeneratedCSSurl = "/css/style.css"
 	cp.ExtraCSSurls = []string{"/css/menu.css"}
 	// TODO: fallback to local jquery.min.js, google how
-	cp.JqueryJSurl = "//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" // "/js/jquery-1.9.1.js"
+	cp.JqueryJSurl = "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" // "/js/jquery-2.0.0.js"
 	cp.Faviconurl = "/img/favicon.ico"
 	cp.ContentTitle = "NOP"
 	cp.ContentHTML = "NOP NOP NOP"
@@ -145,13 +145,13 @@ func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tvgf T
 }
 
 // Some Engines like Admin must be served separately
-// JQuery is at 1.9.1 at the time of writing
-func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jqueryversion string) {
+// jquerypath is ie "/js/jquery.2.0.0.js", will then serve the file at static/js/jquery.2.0.0.js
+func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jquerypath string) {
 	cs := basecp(userState).ColorScheme
 	PublishCPs(userState, cps, cs, tvgf, "/css/menu.css")
 
 	// TODO: Add fallback to this local version
-	Publish("/js/jquery-"+jqueryversion+".js", "static/js/jquery-"+jqueryversion+".js", true)
+	Publish(jquerypath, "static"+jquerypath, true)
 
 	// TODO: Generate these
 	Publish("/robots.txt", "static/various/robots.txt", false)
