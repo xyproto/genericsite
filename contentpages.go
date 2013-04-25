@@ -217,8 +217,8 @@ func RenderPage(page *Page, templateContents map[string]string) (string, string)
 // Wrap a lonely string in an entire webpage
 func (cp *ContentPage) Surround(s string, templateContents map[string]string) (string, string) {
 	cp.ContentHTML = s
-	archpage := genericPageBuilder(cp)
-	return RenderPage(archpage, templateContents)
+	page := genericPageBuilder(cp)
+	return RenderPage(page, templateContents)
 }
 
 // Uses a given WebHandle as the contents for the the ContentPage contents
