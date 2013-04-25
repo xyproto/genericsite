@@ -9,7 +9,7 @@ import (
 	. "github.com/xyproto/browserspeak"
 )
 
-func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgroundTextureURL string, roundedLook bool, cs *ColorScheme) (*Tag, error) {
+func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgroundTextureURL string, roundedLook bool, cs *ColorScheme, addSearchBox bool) (*Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {
 		return nil, err
@@ -41,16 +41,18 @@ func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgro
 	}
 	//titlebox.AddStyle("z-index", "2") // 2 is above the search box which is 1
 
-	searchbox := AddSearchBox(titlebox, searchURL, searchButtonText, roundedLook)
-	searchbox.AddAttr("id", "searchbox")
-	searchbox.AddStyle("position", "relative")
-	searchbox.AddStyle("float", "right")
-	// The padding decides the position for this one
-	searchbox.AddStyle("padding", "0.4em 3em 0 0")
-	searchbox.AddStyle("margin", "0")
-	//searchbox.AddStyle("min-width", "10em")
-	//searchbox.AddStyle("line-height", "10em")
-	//searchbox.AddStyle("z-index", "1") // below the title
+	if addSearchBox {
+		searchbox := AddSearchBox(titlebox, searchURL, searchButtonText, roundedLook)
+		searchbox.AddAttr("id", "searchbox")
+		searchbox.AddStyle("position", "relative")
+		searchbox.AddStyle("float", "right")
+		// The padding decides the position for this one
+		searchbox.AddStyle("padding", "0.4em 3em 0 0")
+		searchbox.AddStyle("margin", "0")
+		//searchbox.AddStyle("min-width", "10em")
+		//searchbox.AddStyle("line-height", "10em")
+		//searchbox.AddStyle("z-index", "1") // below the title
+	}
 
 	return div, nil
 }

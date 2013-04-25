@@ -115,6 +115,7 @@ func AddIfNotAdded(url string, filteredMenuEntries *MenuEntries, menuEntry *Menu
 // TODO: Check for the menyEntry.url first, then check the rights, not the other way around
 // TODO: Fix and refactor this one
 // TODO: Check the user status _once_, and the admin status _once_, then generate the menu
+// TODO: Some way of marking menu entries as user, admin or other rights. Add a group system?
 func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGeneratorFactory {
 	return func(state *UserState) TemplateValueGenerator {
 		return func(ctx *web.Context) TemplateValues {

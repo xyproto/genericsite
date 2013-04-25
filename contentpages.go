@@ -32,6 +32,7 @@ type ContentPage struct {
 	RoundedLook              bool
 	Url                      string
 	ColorScheme              *ColorScheme
+	SearchBox                bool
 }
 
 // Content page generator
@@ -73,6 +74,7 @@ func DefaultCP(userState *UserState) *ContentPage {
 	cp.HeaderJS = ""
 	cp.SearchButtonText = "Search"
 	cp.SearchURL = "/search"
+	cp.SearchBox = true
 
 	// http://wptheming.wpengine.netdna-cdn.com/wp-content/uploads/2010/04/gray-texture.jpg
 	// TODO: Draw these two backgroundimages with a canvas instead
@@ -121,7 +123,7 @@ func genericPageBuilder(cp *ContentPage) *Page {
 	AddHeader(page, cp.HeaderJS)
 	AddGoogleFonts(page, []string{"Armata"})
 	AddBodyStyle(page, cp.BgImageURL, cp.StretchBackground)
-	AddTopBox(page, cp.Title, cp.Subtitle, cp.SearchURL, cp.SearchButtonText, cp.BackgroundTextureURL, cp.RoundedLook, cp.ColorScheme)
+	AddTopBox(page, cp.Title, cp.Subtitle, cp.SearchURL, cp.SearchButtonText, cp.BackgroundTextureURL, cp.RoundedLook, cp.ColorScheme, cp.SearchBox)
 
 	// TODO: Move the menubox into the TopBox
 
