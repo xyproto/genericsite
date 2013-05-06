@@ -5,8 +5,8 @@ package genericsite
 import (
 	"fmt"
 
+	"github.com/hoisie/web"
 	"github.com/xyproto/instapage"
-	"github.com/xyproto/web"
 )
 
 func Hello() string {

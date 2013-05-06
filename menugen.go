@@ -3,8 +3,8 @@ package genericsite
 import (
 	"strings"
 
+	"github.com/hoisie/web"
 	. "github.com/xyproto/browserspeak"
-	"github.com/xyproto/web"
 )
 
 type MenuEntry struct {

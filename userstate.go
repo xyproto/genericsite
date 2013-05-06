@@ -3,8 +3,8 @@ package genericsite
 import (
 	"errors"
 
+	"github.com/hoisie/web"
 	"github.com/xyproto/simpleredis"
-	"github.com/xyproto/web"
 )
 
 const (
