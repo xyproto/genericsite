@@ -1,7 +1,9 @@
 package genericsite
 
 import (
+	"crypto/sha256"
 	"errors"
+	"io"
 
 	"github.com/hoisie/web"
 	"github.com/xyproto/simpleredis"
@@ -129,7 +131,7 @@ func (state *UserState) SetBrowserUsername(ctx *web.Context, username string) er
 	timeout := state.GetCookieTimeout(username)
 	// Create a cookie that lasts for a while ("timeout" seconds),
 	// this is the equivivalent of a session for a given username.
-	ctx.SetSecureCookiePath("user", username, timeout, "/")
+	SetSecureCookiePath(ctx, "user", username, timeout, "/")
 	return nil
 }
 
@@ -188,7 +190,7 @@ func (state *UserState) RemoveAdminStatus(username string) {
 }
 
 // Creates a user from the username and password hash, does not check for rights
-func (state *UserState) addUser(username, passwordHash, email string) {
+func (state *UserState) addUserUnchecked(username, passwordHash, email string) {
 	// Add the user
 	state.usernames.Add(username)
 
@@ -206,7 +208,7 @@ func (state *UserState) addUser(username, passwordHash, email string) {
 // Creates a user and hashes the password, does not check for rights
 func (state *UserState) AddUser(username, password, email string) {
 	passwordHash := HashPasswordVersion3(username, password)
-	state.AddUserUnchecked(username, passwordHash, email)
+	state.addUserUnchecked(username, passwordHash, email)
 }
 
 func (state *UserState) SetLoggedIn(username string) {
