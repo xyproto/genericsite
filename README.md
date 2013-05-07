@@ -5,25 +5,18 @@ Generic website library with search and user administration.
 
 Not the prettiest of libraries, it's part of an experiment in procedural generation of websites.
 
-Features
-========
+Features and limitations
+------------------------
 
-* SHA256 password hashing
+* Uses procedural generation of html and css extensively. Templates would probably be a better solution for the future.
 * User login and registration system
 * Email confirmation system
 * Admin panel
 * Subpages
 * Native speed
 
-TODO
-====
-
-* Move the login and register forms back here from browserspeak
-
 License
-=======
+-------
 
 MIT licensed
-
-
 Alexander Rødseth, 2013
