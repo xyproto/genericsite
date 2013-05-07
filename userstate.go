@@ -187,8 +187,8 @@ func (state *UserState) RemoveAdminStatus(username string) {
 	state.users.Set(username, "admin", "false")
 }
 
-// Creates a user without doing ANY checks
-func (state *UserState) AddUserUnchecked(username, passwordHash, email string) {
+// Creates a user from the username and password hash, does not check for rights
+func (state *UserState) addUser(username, passwordHash, email string) {
 	// Add the user
 	state.usernames.Add(username)
 
@@ -203,6 +203,12 @@ func (state *UserState) AddUserUnchecked(username, passwordHash, email string) {
 	}
 }
 
+// Creates a user and hashes the password, does not check for rights
+func (state *UserState) AddUser(username, password, email string) {
+	passwordHash := HashPasswordVersion3(username, password)
+	state.AddUserUnchecked(username, passwordHash, email)
+}
+
 func (state *UserState) SetLoggedIn(username string) {
 	state.users.Set(username, "loggedin", "true")
 }
@@ -215,4 +221,54 @@ func (state *UserState) SetLoggedOut(username string) {
 func (state *UserState) GetCookieTimeout(username string) int64 {
 	// TODO: Store this in state.users
 	return LOGINCOOKIETIME
+}
+
+// Old password hashing function
+func HashPasswordVersion2(password string) string {
+	hasher := sha256.New()
+	io.WriteString(hasher, password+"some salt is better than none")
+	return string(hasher.Sum(nil))
+}
+
+// New password hashing function, with the username as part of the salt
+func HashPasswordVersion3(username, password string) string {
+	hasher := sha256.New()
+	io.WriteString(hasher, password+"hi"+username)
+	return string(hasher.Sum(nil))
+}
+
+// Check if a password is correct. username is used as part of the hash.
+func CorrectPassword(state *UserState, username, password string) bool {
+	passwordHash, err := state.GetPasswordHash(username)
+	if err != nil {
+		return false
+	}
+	if passwordHash == HashPasswordVersion3(username, password) {
+		return true
+	}
+	if passwordHash == HashPasswordVersion2(password) {
+		return true
+	}
+	return false
+}
+
+// Goes through all the confirmationCodes of all the unconfirmed users
+// and checks if this confirmationCode already is in use
+func AlreadyHasConfirmationCode(state *UserState, confirmationCode string) bool {
+	unconfirmedUsernames, err := state.GetAllUnconfirmedUsernames()
+	if err != nil {
+		return false
+	}
+	for _, aUsername := range unconfirmedUsernames {
+		aConfirmationCode, err := state.GetConfirmationCode(aUsername)
+		if err != nil {
+			// If the confirmation code can not be found, that's okay too
+			return false
+		}
+		if confirmationCode == aConfirmationCode {
+			// Found it
+			return true
+		}
+	}
+	return false
 }
