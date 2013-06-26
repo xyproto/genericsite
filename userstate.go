@@ -19,15 +19,23 @@ type UserState struct {
 	usernames   *simpleredis.Set            // A list of all usernames, for easy enumeration
 	unconfirmed *simpleredis.Set            // A list of unconfirmed usernames, for easy enumeration
 	pool        *simpleredis.ConnectionPool // A connection pool for Redis
+	dbindex     int
 }
 
 // Also creates a new ConnectionPool
-func NewUserState() *UserState {
+func NewUserState(dbindex int) *UserState {
 	pool := simpleredis.NewConnectionPool()
 	state := new(UserState)
+
 	state.users = simpleredis.NewHashMap(pool, "users")
+	state.users.SelectDatabase(dbindex)
+
 	state.usernames = simpleredis.NewSet(pool, "usernames")
+	state.usernames.SelectDatabase(dbindex)
+
 	state.unconfirmed = simpleredis.NewSet(pool, "unconfirmed")
+	state.unconfirmed.SelectDatabase(dbindex)
+
 	state.pool = pool
 	return state
 }
