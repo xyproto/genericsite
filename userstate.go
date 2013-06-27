@@ -37,7 +37,14 @@ func NewUserState(dbindex int) *UserState {
 	state.unconfirmed.SelectDatabase(dbindex)
 
 	state.pool = pool
+
+	state.dbindex = dbindex
+
 	return state
+}
+
+func (state *UserState) GetDatabaseIndex() int {
+	return state.dbindex
 }
 
 func (state *UserState) GetPool() *simpleredis.ConnectionPool {
