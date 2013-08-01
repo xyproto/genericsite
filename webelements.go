@@ -238,7 +238,7 @@ func AddTitleBox(tag *Tag, title, subtitle string, cs *ColorScheme) *Tag {
 }
 
 // Takes a page and a colon-separated string slice of text:url, hiddenlinks is just a list of the url part
-func AddMenuBox(page *Page, darkBackgroundTexture string) (*Tag, error) {
+func AddMenuBox(page *Page, darkBackgroundTexture string, customSansSerif string) (*Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {
 		return nil, err
@@ -257,8 +257,15 @@ func AddMenuBox(page *Page, darkBackgroundTexture string) (*Tag, error) {
 	div.AddStyle("background", "url('"+darkBackgroundTexture+"')")
 	div.AddStyle("position", "fixed")
 	div.AddStyle("box-shadow", "1px 3px 5px rgba(0,0,0, .8)")
+	if customSansSerif != "" {
+		div.AddStyle("font-family", customSansSerif)
+	}
 
 	div.AddLastContent("{{{menu}}}")
 
 	return div, nil
+}
+
+func BackButton() string {
+	return "<button onClick='history.go(-1);'>Back</button>"
 }

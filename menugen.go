@@ -45,7 +45,7 @@ func Links2menuEntries(links []string) MenuEntries {
 func MenuSnippet(menuEntries MenuEntries) *Page {
 	var a, li, sep *Tag
 
-	page, ul := CowboyTag("ul")
+	page, ul := StandaloneTag("ul")
 	ul.AddAttr("class", "menuList")
 	//ul.AddStyle("list-style-type", "none")
 	//ul.AddStyle("float", "left")
@@ -63,6 +63,7 @@ func MenuSnippet(menuEntries MenuEntries) *Page {
 		// All menu entries are now hidden by default!
 		//li.AddStyle("display", "none")
 		//li.AddStyle("display", "inline")
+
 		li.SansSerif()
 		//li.CustomSansSerif("Armata")
 

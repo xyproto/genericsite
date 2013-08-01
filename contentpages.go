@@ -33,6 +33,9 @@ type ContentPage struct {
 	Url                      string
 	ColorScheme              *ColorScheme
 	SearchBox                bool
+	GoogleFonts              []string
+	CustomSansSerif          string
+	CustomSerif              string
 }
 
 // Content page generator
@@ -104,6 +107,10 @@ func DefaultCP(userState *UserState) *ContentPage {
 
 	cp.ColorScheme = &cs
 
+	cp.GoogleFonts = []string{"Armata", "IM Fell English SC"}
+	cp.CustomSansSerif = "" // Use the default sans serif
+	cp.CustomSerif = "IM Fell English SC"
+
 	return &cp
 }
 
@@ -121,13 +128,13 @@ func genericPageBuilder(cp *ContentPage) *Page {
 	page.LinkToFavicon(cp.Faviconurl)
 
 	AddHeader(page, cp.HeaderJS)
-	AddGoogleFonts(page, []string{"Armata"})
+	AddGoogleFonts(page, cp.GoogleFonts)
 	AddBodyStyle(page, cp.BgImageURL, cp.StretchBackground)
 	AddTopBox(page, cp.Title, cp.Subtitle, cp.SearchURL, cp.SearchButtonText, cp.BackgroundTextureURL, cp.RoundedLook, cp.ColorScheme, cp.SearchBox)
 
 	// TODO: Move the menubox into the TopBox
 
-	AddMenuBox(page, cp.DarkBackgroundTextureURL)
+	AddMenuBox(page, cp.DarkBackgroundTextureURL, cp.CustomSansSerif)
 
 	AddContent(page, cp.ContentTitle, cp.ContentHTML+DocumentReadyJS(cp.ContentJS))
 
@@ -208,7 +215,7 @@ func (cp *ContentPage) Pub(userState *UserState, url, cssurl string, cs *ColorSc
 	web.Get(cssurl, GenerateMenuCSS(userState, cp.StretchBackground, cs))
 }
 
-// TODO: Write a function for rendering a CowboyTag inside a Page by the use of template {{{placeholders}}
+// TODO: Write a function for rendering a StandaloneTag inside a Page by the use of template {{{placeholders}}
 
 // Render a page by inserting data at the {{{placeholders}}} for both html and css
 func RenderPage(page *Page, templateContents map[string]string) (string, string) {
