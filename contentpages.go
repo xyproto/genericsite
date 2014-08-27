@@ -175,7 +175,7 @@ func GenerateMenuCSS(state *UserState, stretchBackground bool, cs *ColorScheme) 
 		ctx.ContentType("css")
 
 		// one of the extra css files that are loaded after the main style
-		retval := mustache.RenderFile("templates/style.tmpl", cs)
+		retval := mustache.RenderFile("/usr/share/templates/menustyle.tmpl", cs)
 
 		// The load order of background-color, background-size and background-image
 		// is actually significant in some browsers! Do not reorder lightly.

@@ -5,6 +5,7 @@ Generic website library with search and user administration.
 
 Not the prettiest of libraries, it's part of an experiment in procedural generation of websites.
 
+
 Features and limitations
 ------------------------
 
@@ -14,6 +15,13 @@ Features and limitations
 * Admin panel
 * Subpages
 * Native speed
+
+
+Templates
+---------
+
+* Must be placed in /usr/share/templates, for now
+
 
 License
 -------
