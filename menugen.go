@@ -5,6 +5,7 @@ import (
 
 	"github.com/hoisie/web"
 	. "github.com/xyproto/browserspeak"
+	. "github.com/xyproto/webhandle"
 )
 
 type MenuEntry struct {
@@ -46,7 +47,7 @@ func MenuSnippet(menuEntries MenuEntries) *Page {
 	var a, li, sep *Tag
 
 	page, ul := StandaloneTag("ul")
-	ul.AddAttr("class", "menuList")
+	ul.AddAttrib("class", "menuList")
 	//ul.AddStyle("list-style-type", "none")
 	//ul.AddStyle("float", "left")
 	//ul.AddStyle("margin", "0")
@@ -54,11 +55,11 @@ func MenuSnippet(menuEntries MenuEntries) *Page {
 	for i, menuEntry := range menuEntries {
 
 		li = ul.AddNewTag("li")
-		li.AddAttr("class", "menuEntry")
+		li.AddAttrib("class", "menuEntry")
 
 		// TODO: Make sure not duplicate ids are added for two menu entries named "Hi there" and "Hi you"
 		menuId := "menu" + menuEntry.id
-		li.AddAttr("id", menuId)
+		li.AddAttrib("id", menuId)
 
 		// All menu entries are now hidden by default!
 		//li.AddStyle("display", "none")
@@ -72,12 +73,12 @@ func MenuSnippet(menuEntries MenuEntries) *Page {
 			// Insert a '|' character in a div
 			sep = li.AddNewTag("div")
 			sep.AddContent("|")
-			sep.AddAttr("class", "separator")
+			sep.AddAttrib("class", "separator")
 		}
 
 		a = li.AddNewTag("a")
-		a.AddAttr("class", "menulink")
-		a.AddAttr("href", menuEntry.url)
+		a.AddAttrib("class", "menulink")
+		a.AddAttrib("href", menuEntry.url)
 		a.AddContent(menuEntry.text)
 
 	}

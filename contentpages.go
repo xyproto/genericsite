@@ -6,6 +6,8 @@ import (
 	"github.com/drbawb/mustache"
 	"github.com/hoisie/web"
 	. "github.com/xyproto/browserspeak"
+	"github.com/xyproto/webhandle"
+	//"github.com/unrolled/render"
 )
 
 type ContentPage struct {
@@ -60,7 +62,7 @@ type ColorScheme struct {
 
 type BaseCP func(state *UserState) *ContentPage
 
-type TemplateValueGeneratorFactory func(*UserState) TemplateValueGenerator
+type TemplateValueGeneratorFactory func(*UserState) webhandle.TemplateValueGenerator
 
 // The default settings
 // Do not publish this page directly, but use it as a basis for the other pages
@@ -160,41 +162,21 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf Tem
 	PublishCPs(userState, cps, cs, tvgf, "/css/menu.css")
 
 	// TODO: Add fallback to this local version
-	Publish(jquerypath, "static"+jquerypath, true)
+	webhandle.Publish(jquerypath, "static"+jquerypath, true)
 
 	// TODO: Generate these
-	Publish("/robots.txt", "static/various/robots.txt", false)
-	Publish("/sitemap_index.xml", "static/various/sitemap_index.xml", false)
+	webhandle.Publish("/robots.txt", "static/various/robots.txt", false)
+	webhandle.Publish("/sitemap_index.xml", "static/various/sitemap_index.xml", false)
 }
 
 // CSS for the menu, and a bit more
-func GenerateMenuCSS(state *UserState, stretchBackground bool, cs *ColorScheme) SimpleContextHandle {
+func GenerateMenuCSS(state *UserState, stretchBackground bool, cs *ColorScheme) webhandle.SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		ctx.ContentType("css")
+
 		// one of the extra css files that are loaded after the main style
-		retval := `
-a {
-  text-decoration: none;
-  color: #303030;
-  font-weight: regular;
-}
-a:link {color:` + cs.Menu_link + `;}
-a:visited {color:` + cs.Menu_link + `;}
-a:hover {color:` + cs.Menu_hover + `;}
-a:active {color:` + cs.Menu_active + `;}
-.menuEntry {
-	display: inline;
-}
-.menuList {
-	list-style-type: none;
-	float: left;
-	margin: 0;
-}
-.separator {
-	display: inline;
-	color: #a0a0a0;
-}
-`
+		retval := mustache.RenderFile("templates/style.tmpl", cs)
+
 		// The load order of background-color, background-size and background-image
 		// is actually significant in some browsers! Do not reorder lightly.
 		if stretchBackground {
@@ -208,10 +190,10 @@ a:active {color:` + cs.Menu_active + `;}
 }
 
 // Make an html and css page available
-func (cp *ContentPage) Pub(userState *UserState, url, cssurl string, cs *ColorScheme, tvg TemplateValueGenerator) {
+func (cp *ContentPage) Pub(userState *UserState, url, cssurl string, cs *ColorScheme, tvg webhandle.TemplateValueGenerator) {
 	genericpage := genericPageBuilder(cp)
-	web.Get(url, GenerateHTMLwithTemplate(genericpage, tvg))
-	web.Get(cp.GeneratedCSSurl, GenerateCSS(genericpage))
+	web.Get(url, webhandle.GenerateHTMLwithTemplate(genericpage, tvg))
+	web.Get(cp.GeneratedCSSurl, webhandle.GenerateCSS(genericpage))
 	web.Get(cssurl, GenerateMenuCSS(userState, cp.StretchBackground, cs))
 }
 
@@ -231,7 +213,7 @@ func (cp *ContentPage) Surround(s string, templateContents map[string]string) (s
 }
 
 // Uses a given WebHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapWebHandle(wh WebHandle, tvg TemplateValueGenerator) WebHandle {
+func (cp *ContentPage) WrapWebHandle(wh webhandle.WebHandle, tvg webhandle.TemplateValueGenerator) webhandle.WebHandle {
 	return func(ctx *web.Context, val string) string {
 		html, css := cp.Surround(wh(ctx, val), tvg(ctx))
 		web.Get(cp.GeneratedCSSurl, css)
@@ -240,7 +222,7 @@ func (cp *ContentPage) WrapWebHandle(wh WebHandle, tvg TemplateValueGenerator) W
 }
 
 // Uses a given SimpleContextHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapSimpleContextHandle(sch SimpleContextHandle, tvg TemplateValueGenerator) SimpleContextHandle {
+func (cp *ContentPage) WrapSimpleContextHandle(sch webhandle.SimpleContextHandle, tvg webhandle.TemplateValueGenerator) webhandle.SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		html, css := cp.Surround(sch(ctx), tvg(ctx))
 		web.Get(cp.GeneratedCSSurl, css)
