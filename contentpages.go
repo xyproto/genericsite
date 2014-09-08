@@ -5,7 +5,7 @@ import (
 
 	"github.com/drbawb/mustache"
 	"github.com/hoisie/web"
-	. "github.com/xyproto/browserspeak"
+	. "github.com/xyproto/onthefly"
 	"github.com/xyproto/webhandle"
 	//"github.com/unrolled/render"
 )
