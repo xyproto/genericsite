@@ -1,15 +1,14 @@
 genericsite
 ===========
 
-Generic website library with search and user administration.
-
-Not the prettiest of libraries, it's part of an experiment in procedural generation of websites.
-
+* Generic website library with search and user administration.
+* Part of an experiment in procedural generation of websites.
+* Will probably be modified to use templates instead, in the future.
 
 Features and limitations
 ------------------------
 
-* Uses procedural generation of html and css extensively. Templates would probably be a better solution for the future.
+* Uses procedural generation of html and css extensively.
 * User login and registration system
 * Email confirmation system
 * Admin panel
@@ -23,8 +22,8 @@ Templates
 * Must be placed in /usr/share/templates, for now
 
 
-License
--------
+General information
+-------------------
 
-MIT licensed
-Alexander Rødseth, 2013
+License: MIT
+Author: Alexander Rødseth

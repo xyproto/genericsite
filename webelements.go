@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/xyproto/browserspeak"
+	. "github.com/xyproto/onthefly"
 )
 
 func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgroundTextureURL string, roundedLook bool, cs *ColorScheme, addSearchBox bool) (*Tag, error) {
