@@ -7,7 +7,6 @@ import (
 	"github.com/hoisie/web"
 	. "github.com/xyproto/browserspeak"
 	"github.com/xyproto/webhandle"
-	//"github.com/unrolled/render"
 )
 
 type ContentPage struct {
