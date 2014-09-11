@@ -6,6 +6,7 @@ import (
 	"github.com/drbawb/mustache"
 	"github.com/hoisie/web"
 	. "github.com/xyproto/onthefly"
+	"github.com/xyproto/permissions"
 	"github.com/xyproto/webhandle"
 )
 
@@ -29,7 +30,7 @@ type ContentPage struct {
 	DarkBackgroundTextureURL string
 	FooterTextColor          string
 	FooterColor              string
-	UserState                *UserState
+	UserState                *permissions.UserState
 	RoundedLook              bool
 	Url                      string
 	ColorScheme              *ColorScheme
@@ -40,7 +41,7 @@ type ContentPage struct {
 }
 
 // Content page generator
-type CPgen (func(userState *UserState) *ContentPage)
+type CPgen (func(userState *permissions.UserState) *ContentPage)
 
 // A collection of ContentPages
 type PageCollection []ContentPage
@@ -59,13 +60,13 @@ type ColorScheme struct {
 	TitleText          string
 }
 
-type BaseCP func(state *UserState) *ContentPage
+type BaseCP func(state *permissions.UserState) *ContentPage
 
-type TemplateValueGeneratorFactory func(*UserState) webhandle.TemplateValueGenerator
+type TemplateValueGeneratorFactory func(*permissions.UserState) webhandle.TemplateValueGenerator
 
 // The default settings
 // Do not publish this page directly, but use it as a basis for the other pages
-func DefaultCP(userState *UserState) *ContentPage {
+func DefaultCP(userState *permissions.UserState) *ContentPage {
 	var cp ContentPage
 	cp.GeneratedCSSurl = "/css/style.css"
 	cp.ExtraCSSurls = []string{"/css/menu.css"}
@@ -146,7 +147,7 @@ func genericPageBuilder(cp *ContentPage) *Page {
 }
 
 // Publish a list of ContentPaages, a colorscheme and template content
-func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tvgf TemplateValueGeneratorFactory, cssurl string) {
+func PublishCPs(userState *permissions.UserState, pc PageCollection, cs *ColorScheme, tvgf TemplateValueGeneratorFactory, cssurl string) {
 	// For each content page in the page collection
 	for _, cp := range pc {
 		// TODO: different css urls for all of these?
@@ -156,7 +157,7 @@ func PublishCPs(userState *UserState, pc PageCollection, cs *ColorScheme, tvgf T
 
 // Some Engines like Admin must be served separately
 // jquerypath is ie "/js/jquery.2.0.0.js", will then serve the file at static/js/jquery.2.0.0.js
-func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jquerypath string) {
+func ServeSite(basecp BaseCP, userState *permissions.UserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jquerypath string) {
 	cs := basecp(userState).ColorScheme
 	PublishCPs(userState, cps, cs, tvgf, "/css/menu.css")
 
@@ -169,7 +170,7 @@ func ServeSite(basecp BaseCP, userState *UserState, cps PageCollection, tvgf Tem
 }
 
 // CSS for the menu, and a bit more
-func GenerateMenuCSS(state *UserState, stretchBackground bool, cs *ColorScheme) webhandle.SimpleContextHandle {
+func GenerateMenuCSS(state *permissions.UserState, stretchBackground bool, cs *ColorScheme) webhandle.SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		ctx.ContentType("css")
 
@@ -189,7 +190,7 @@ func GenerateMenuCSS(state *UserState, stretchBackground bool, cs *ColorScheme) 
 }
 
 // Make an html and css page available
-func (cp *ContentPage) Pub(userState *UserState, url, cssurl string, cs *ColorScheme, tvg webhandle.TemplateValueGenerator) {
+func (cp *ContentPage) Pub(userState *permissions.UserState, url, cssurl string, cs *ColorScheme, tvg webhandle.TemplateValueGenerator) {
 	genericpage := genericPageBuilder(cp)
 	web.Get(url, webhandle.GenerateHTMLwithTemplate(genericpage, tvg))
 	web.Get(cp.GeneratedCSSurl, webhandle.GenerateCSS(genericpage))
