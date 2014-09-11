@@ -5,6 +5,7 @@ genericsite
 * Part of an experiment in procedural generation of websites.
 * Will probably be modified to use templates instead, in the future.
 
+
 Features and limitations
 ------------------------
 
@@ -25,5 +26,5 @@ Templates
 General information
 -------------------
 
-License: MIT
-Author: Alexander Rødseth
+* License: MIT
+* Author: Alexander Rødseth
