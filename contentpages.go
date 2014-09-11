@@ -175,7 +175,7 @@ func GenerateMenuCSS(state *permissions.UserState, stretchBackground bool, cs *C
 		ctx.ContentType("css")
 
 		// one of the extra css files that are loaded after the main style
-		retval := mustache.RenderFile("/usr/share/templates/menustyle.tmpl", cs)
+		retval := mustache.RenderFile(menustyle_tmpl, cs)
 
 		// The load order of background-color, background-size and background-image
 		// is actually significant in some browsers! Do not reorder lightly.
@@ -229,3 +229,42 @@ func (cp *ContentPage) WrapSimpleContextHandle(sch webhandle.SimpleContextHandle
 		return html
 	}
 }
+
+const menustyle_tmpl = `
+a {
+  text-decoration: none;
+  color: #303030;
+  font-weight: regular;
+}
+
+a:link {
+  color: {{Menu_link}};
+}
+
+a:visited {
+  color: {{Menu_link}};
+}
+
+a:hover {
+  color: {{Menu_hover}};
+}
+
+a:active {
+  color: {{Menu_active}};
+}
+
+.menuEntry {
+  display: inline;
+}
+
+.menuList {
+  list-style-type: none;
+  float: left;
+  margin: 0;
+}
+
+.separator {
+  display: inline;
+  color: #a0a0a0;
+}
+`

@@ -16,13 +16,6 @@ Features and limitations
 * Subpages
 * Native speed
 
-
-Templates
----------
-
-* Must be placed in /usr/share/templates, for now
-
-
 General information
 -------------------
 
