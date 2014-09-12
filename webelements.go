@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/xyproto/onthefly"
+	"github.com/xyproto/onthefly"
 )
 
-func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgroundTextureURL string, roundedLook bool, cs *ColorScheme, addSearchBox bool) (*Tag, error) {
+func AddTopBox(page *onthefly.Page, title, subtitle, searchURL, searchButtonText, backgroundTextureURL string, roundedLook bool, cs *ColorScheme, addSearchBox bool) (*onthefly.Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func AddTopBox(page *Page, title, subtitle, searchURL, searchButtonText, backgro
 }
 
 // TODO: Place at the bottom of the content instead of at the bottom of the window
-func AddFooter(page *Page, footerText, footerTextColor, footerColor string, elapsed time.Duration) (*Tag, error) {
+func AddFooter(page *onthefly.Page, footerText, footerTextColor, footerColor string, elapsed time.Duration) (*onthefly.Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func AddFooter(page *Page, footerText, footerTextColor, footerColor string, elap
 	return div, nil
 }
 
-func AddContent(page *Page, contentTitle, contentHTML string) (*Tag, error) {
+func AddContent(page *onthefly.Page, contentTitle, contentHTML string) (*onthefly.Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func AddContent(page *Page, contentTitle, contentHTML string) (*Tag, error) {
 
 // Add a search box to the page, actionURL is the url to use as a get action,
 // buttonText is the text on the search button
-func AddSearchBox(tag *Tag, actionURL, buttonText string, roundedLook bool) *Tag {
+func AddSearchBox(tag *onthefly.Tag, actionURL, buttonText string, roundedLook bool) *onthefly.Tag {
 
 	div := tag.AddNewTag("div")
 	div.AddAttrib("id", "searchboxdiv")
@@ -183,7 +183,7 @@ func AddSearchBox(tag *Tag, actionURL, buttonText string, roundedLook bool) *Tag
 	return div
 }
 
-func AddTitleBox(tag *Tag, title, subtitle string, cs *ColorScheme) *Tag {
+func AddTitleBox(tag *onthefly.Tag, title, subtitle string, cs *ColorScheme) *onthefly.Tag {
 
 	div := tag.AddNewTag("div")
 	div.AddAttrib("id", "titlebox")
@@ -238,7 +238,7 @@ func AddTitleBox(tag *Tag, title, subtitle string, cs *ColorScheme) *Tag {
 }
 
 // Takes a page and a colon-separated string slice of text:url, hiddenlinks is just a list of the url part
-func AddMenuBox(page *Page, darkBackgroundTexture string, customSansSerif string) (*Tag, error) {
+func AddMenuBox(page *onthefly.Page, darkBackgroundTexture string, customSansSerif string) (*onthefly.Tag, error) {
 	body, err := page.GetTag("body")
 	if err != nil {
 		return nil, err

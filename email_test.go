@@ -5,7 +5,7 @@ import (
 )
 
 func Test1(t *testing.T) {
-	err := ConfirmationEmail("mindfish.me", "http://www.ikke.no/", "rodseth", "rodseth@gmail.com")
+	err := ConfirmationEmail("origin_domain.com", "http://www.ikke.no/", "rodseth", "rodseth@gmail.com")
 	if err != nil {
 		t.Log("sending email failed")
 	}

@@ -4,9 +4,9 @@ import (
 	"strings"
 
 	"github.com/hoisie/web"
-	. "github.com/xyproto/onthefly"
+	"github.com/xyproto/onthefly"
 	"github.com/xyproto/permissions"
-	. "github.com/xyproto/webhandle"
+	"github.com/xyproto/webhandle"
 )
 
 type MenuEntry struct {
@@ -30,7 +30,7 @@ func (me *MenuEntry) AutoId() {
 // Takes something like "Admin:/admin" and returns a *MenuEntry
 func NewMenuEntry(text_and_url string) *MenuEntry {
 	var me MenuEntry
-	me.text, me.url = ColonSplit(text_and_url)
+	me.text, me.url = permissions.ColonSplit(text_and_url)
 	me.AutoId()
 	return &me
 }
@@ -44,10 +44,10 @@ func Links2menuEntries(links []string) MenuEntries {
 }
 
 // Generate tags for the menu based on a list of "MenuDescription:/menu/url"
-func MenuSnippet(menuEntries MenuEntries) *Page {
-	var a, li, sep *Tag
+func MenuSnippet(menuEntries MenuEntries) *onthefly.Page {
+	var a, li, sep *onthefly.Tag
 
-	page, ul := StandaloneTag("ul")
+	page, ul := onthefly.StandaloneTag("ul")
 	ul.AddAttrib("class", "menuList")
 	//ul.AddStyle("list-style-type", "none")
 	//ul.AddStyle("float", "left")
@@ -120,8 +120,8 @@ func AddIfNotAdded(url string, filteredMenuEntries *MenuEntries, menuEntry *Menu
 // TODO: Check the user status _once_, and the admin status _once_, then generate the menu
 // TODO: Some way of marking menu entries as user, admin or other rights. Add a group system?
 func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGeneratorFactory {
-	return func(state *permissions.UserState) TemplateValueGenerator {
-		return func(ctx *web.Context) TemplateValues {
+	return func(state *permissions.UserState) webhandle.TemplateValueGenerator {
+		return func(ctx *web.Context) onthefly.TemplateValues {
 
 			userRights := state.UserRights(ctx.Request)
 			adminRights := state.AdminRights(ctx.Request)
@@ -187,14 +187,14 @@ func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGenerator
 			// TODO: Return the CSS as well somehow
 			//css := page.CSS()
 
-			return TemplateValues{"menu": retval}
+			return onthefly.TemplateValues{"menu": retval}
 		}
 	}
 }
 
 // Combines two TemplateValueGenerators into one TemplateValueGenerator by adding the strings per key
-func TemplateValueGeneratorCombinator(tvg1, tvg2 TemplateValueGenerator) TemplateValueGenerator {
-	return func(ctx *web.Context) TemplateValues {
+func TemplateValueGeneratorCombinator(tvg1, tvg2 webhandle.TemplateValueGenerator) webhandle.TemplateValueGenerator {
+	return func(ctx *web.Context) onthefly.TemplateValues {
 		tv1 := tvg1(ctx)
 		tv2 := tvg2(ctx)
 		for key, value := range tv2 {

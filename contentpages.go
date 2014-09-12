@@ -5,64 +5,69 @@ import (
 
 	"github.com/drbawb/mustache"
 	"github.com/hoisie/web"
-	. "github.com/xyproto/onthefly"
+	"github.com/xyproto/onthefly"
 	"github.com/xyproto/permissions"
 	"github.com/xyproto/webhandle"
 )
 
-type ContentPage struct {
-	GeneratedCSSurl          string
-	ExtraCSSurls             []string
-	JqueryJSurl              string
-	Faviconurl               string
-	BgImageURL               string
-	StretchBackground        bool
-	Title                    string
-	Subtitle                 string
-	ContentTitle             string
-	ContentHTML              string
-	HeaderJS                 string
-	ContentJS                string
-	SearchButtonText         string
-	SearchURL                string
-	FooterText               string
-	BackgroundTextureURL     string
-	DarkBackgroundTextureURL string
-	FooterTextColor          string
-	FooterColor              string
-	UserState                *permissions.UserState
-	RoundedLook              bool
-	Url                      string
-	ColorScheme              *ColorScheme
-	SearchBox                bool
-	GoogleFonts              []string
-	CustomSansSerif          string
-	CustomSerif              string
-}
+type (
 
-// Content page generator
-type CPgen (func(userState *permissions.UserState) *ContentPage)
+	// The main structure, defining the look and feel of the page
+	ContentPage struct {
+		GeneratedCSSurl          string
+		ExtraCSSurls             []string
+		JqueryJSurl              string
+		Faviconurl               string
+		BgImageURL               string
+		StretchBackground        bool
+		Title                    string
+		Subtitle                 string
+		ContentTitle             string
+		ContentHTML              string
+		HeaderJS                 string
+		ContentJS                string
+		SearchButtonText         string
+		SearchURL                string
+		FooterText               string
+		BackgroundTextureURL     string
+		DarkBackgroundTextureURL string
+		FooterTextColor          string
+		FooterColor              string
+		UserState                *permissions.UserState
+		RoundedLook              bool
+		Url                      string
+		ColorScheme              *ColorScheme
+		SearchBox                bool
+		GoogleFonts              []string
+		CustomSansSerif          string
+		CustomSerif              string
+	}
 
-// A collection of ContentPages
-type PageCollection []ContentPage
+	// Content page generator
+	CPgen (func(userState *permissions.UserState) *ContentPage)
 
-// Every input from the user must be intitially stored in a UserInput variable, not in a string!
-// This is just to be aware of which data one should be careful with, and to keep it clean.
-type UserInput string
+	// A collection of ContentPages
+	PageCollection []ContentPage
 
-type ColorScheme struct {
-	Darkgray           string
-	Nicecolor          string
-	Menu_link          string
-	Menu_hover         string
-	Menu_active        string
-	Default_background string
-	TitleText          string
-}
+	// Every input from the user must be intitially stored in a UserInput variable, not in a string!
+	// This is just to be aware of which data one should be careful with, and to keep it clean.
+	UserInput string
 
-type BaseCP func(state *permissions.UserState) *ContentPage
+	ColorScheme struct {
+		Darkgray           string
+		Nicecolor          string
+		Menu_link          string
+		Menu_hover         string
+		Menu_active        string
+		Default_background string
+		TitleText          string
+	}
 
-type TemplateValueGeneratorFactory func(*permissions.UserState) webhandle.TemplateValueGenerator
+	// Base content page
+	BaseCP func(state *permissions.UserState) *ContentPage
+
+	TemplateValueGeneratorFactory func(*permissions.UserState) webhandle.TemplateValueGenerator
+)
 
 // The default settings
 // Do not publish this page directly, but use it as a basis for the other pages
@@ -116,11 +121,11 @@ func DefaultCP(userState *permissions.UserState) *ContentPage {
 	return &cp
 }
 
-func genericPageBuilder(cp *ContentPage) *Page {
+func genericPageBuilder(cp *ContentPage) *onthefly.Page {
 	// TODO: Record the time from one step out, because content may be generated and inserted into this generated conten
 	startTime := time.Now()
 
-	page := NewHTML5Page(cp.Title + " " + cp.Subtitle)
+	page := onthefly.NewHTML5Page(cp.Title + " " + cp.Subtitle)
 
 	page.LinkToCSS(cp.GeneratedCSSurl)
 	for _, cssurl := range cp.ExtraCSSurls {
@@ -129,16 +134,16 @@ func genericPageBuilder(cp *ContentPage) *Page {
 	page.LinkToJS(cp.JqueryJSurl)
 	page.LinkToFavicon(cp.Faviconurl)
 
-	AddHeader(page, cp.HeaderJS)
-	AddGoogleFonts(page, cp.GoogleFonts)
-	AddBodyStyle(page, cp.BgImageURL, cp.StretchBackground)
+	onthefly.AddHeader(page, cp.HeaderJS)
+	onthefly.AddGoogleFonts(page, cp.GoogleFonts)
+	onthefly.AddBodyStyle(page, cp.BgImageURL, cp.StretchBackground)
 	AddTopBox(page, cp.Title, cp.Subtitle, cp.SearchURL, cp.SearchButtonText, cp.BackgroundTextureURL, cp.RoundedLook, cp.ColorScheme, cp.SearchBox)
 
 	// TODO: Move the menubox into the TopBox
 
 	AddMenuBox(page, cp.DarkBackgroundTextureURL, cp.CustomSansSerif)
 
-	AddContent(page, cp.ContentTitle, cp.ContentHTML+DocumentReadyJS(cp.ContentJS))
+	AddContent(page, cp.ContentTitle, cp.ContentHTML+onthefly.DocumentReadyJS(cp.ContentJS))
 
 	elapsed := time.Since(startTime)
 	AddFooter(page, cp.FooterText, cp.FooterTextColor, cp.FooterColor, elapsed)
@@ -200,7 +205,7 @@ func (cp *ContentPage) Pub(userState *permissions.UserState, url, cssurl string,
 // TODO: Write a function for rendering a StandaloneTag inside a Page by the use of template {{{placeholders}}
 
 // Render a page by inserting data at the {{{placeholders}}} for both html and css
-func RenderPage(page *Page, templateContents map[string]string) (string, string) {
+func RenderPage(page *onthefly.Page, templateContents map[string]string) (string, string) {
 	// Note that the whitespace formatting of the generated html matter for the menu layout!
 	return mustache.Render(page.String(), templateContents), mustache.Render(page.GetCSS(), templateContents)
 }
@@ -230,6 +235,7 @@ func (cp *ContentPage) WrapSimpleContextHandle(sch webhandle.SimpleContextHandle
 	}
 }
 
+// Template for the CSS for the menu
 const menustyle_tmpl = `
 a {
   text-decoration: none;
