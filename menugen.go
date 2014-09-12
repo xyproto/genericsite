@@ -30,7 +30,7 @@ func (me *MenuEntry) AutoId() {
 // Takes something like "Admin:/admin" and returns a *MenuEntry
 func NewMenuEntry(text_and_url string) *MenuEntry {
 	var me MenuEntry
-	me.text, me.url = permissions.ColonSplit(text_and_url)
+	me.text, me.url = webhandle.ColonSplit(text_and_url)
 	me.AutoId()
 	return &me
 }
