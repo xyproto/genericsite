@@ -66,7 +66,7 @@ type (
 	// Base content page
 	BaseCP func(state *permissions.UserState) *ContentPage
 
-	TemplateValueGeneratorFactory func(*permissions.UserState) webhandle.TemplateValueGenerator
+	TemplateValueGeneratorFactory func(*permissions.UserState) webhandle.OldTemplateValueGenerator
 )
 
 // The default settings
@@ -167,11 +167,11 @@ func ServeSite(basecp BaseCP, userState *permissions.UserState, cps PageCollecti
 	PublishCPs(userState, cps, cs, tvgf, "/css/menu.css")
 
 	// TODO: Add fallback to this local version
-	webhandle.Publish(jquerypath, "static"+jquerypath, true)
+	webhandle.OldPublish(jquerypath, "static"+jquerypath, true)
 
 	// TODO: Generate these
-	webhandle.Publish("/robots.txt", "static/various/robots.txt", false)
-	webhandle.Publish("/sitemap_index.xml", "static/various/sitemap_index.xml", false)
+	webhandle.OldPublish("/robots.txt", "static/various/robots.txt", false)
+	webhandle.OldPublish("/sitemap_index.xml", "static/various/sitemap_index.xml", false)
 }
 
 // CSS for the menu, and a bit more
@@ -195,9 +195,9 @@ func GenerateMenuCSS(state *permissions.UserState, stretchBackground bool, cs *C
 }
 
 // Make an html and css page available
-func (cp *ContentPage) Pub(userState *permissions.UserState, url, cssurl string, cs *ColorScheme, tvg webhandle.TemplateValueGenerator) {
+func (cp *ContentPage) Pub(userState *permissions.UserState, url, cssurl string, cs *ColorScheme, tvg webhandle.OldTemplateValueGenerator) {
 	genericpage := genericPageBuilder(cp)
-	web.Get(url, webhandle.GenerateHTMLwithTemplate(genericpage, tvg))
+	web.Get(url, webhandle.OldGenerateHTMLwithTemplate(genericpage, tvg))
 	web.Get(cp.GeneratedCSSurl, webhandle.GenerateCSS(genericpage))
 	web.Get(cssurl, GenerateMenuCSS(userState, cp.StretchBackground, cs))
 }
@@ -218,7 +218,7 @@ func (cp *ContentPage) Surround(s string, templateContents map[string]string) (s
 }
 
 // Uses a given WebHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapWebHandle(wh webhandle.WebHandle, tvg webhandle.TemplateValueGenerator) webhandle.WebHandle {
+func (cp *ContentPage) WrapWebHandle(wh webhandle.WebHandle, tvg webhandle.OldTemplateValueGenerator) webhandle.WebHandle {
 	return func(ctx *web.Context, val string) string {
 		html, css := cp.Surround(wh(ctx, val), tvg(ctx))
 		web.Get(cp.GeneratedCSSurl, css)
@@ -227,7 +227,7 @@ func (cp *ContentPage) WrapWebHandle(wh webhandle.WebHandle, tvg webhandle.Templ
 }
 
 // Uses a given SimpleContextHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapSimpleContextHandle(sch webhandle.SimpleContextHandle, tvg webhandle.TemplateValueGenerator) webhandle.SimpleContextHandle {
+func (cp *ContentPage) WrapSimpleContextHandle(sch webhandle.SimpleContextHandle, tvg webhandle.OldTemplateValueGenerator) webhandle.SimpleContextHandle {
 	return func(ctx *web.Context) string {
 		html, css := cp.Surround(sch(ctx), tvg(ctx))
 		web.Get(cp.GeneratedCSSurl, css)

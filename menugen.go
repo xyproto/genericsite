@@ -30,7 +30,7 @@ func (me *MenuEntry) AutoId() {
 // Takes something like "Admin:/admin" and returns a *MenuEntry
 func NewMenuEntry(text_and_url string) *MenuEntry {
 	var me MenuEntry
-	me.text, me.url = webhandle.ColonSplit(text_and_url)
+	me.text, me.url = webhandle.HostPortSplit(text_and_url)
 	me.AutoId()
 	return &me
 }
@@ -120,7 +120,7 @@ func AddIfNotAdded(url string, filteredMenuEntries *MenuEntries, menuEntry *Menu
 // TODO: Check the user status _once_, and the admin status _once_, then generate the menu
 // TODO: Some way of marking menu entries as user, admin or other rights. Add a group system?
 func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGeneratorFactory {
-	return func(state *permissions.UserState) webhandle.TemplateValueGenerator {
+	return func(state *permissions.UserState) webhandle.OldTemplateValueGenerator {
 		return func(ctx *web.Context) onthefly.TemplateValues {
 
 			userRights := state.UserRights(ctx.Request)
@@ -193,7 +193,7 @@ func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGenerator
 }
 
 // Combines two TemplateValueGenerators into one TemplateValueGenerator by adding the strings per key
-func TemplateValueGeneratorCombinator(tvg1, tvg2 webhandle.TemplateValueGenerator) webhandle.TemplateValueGenerator {
+func TemplateValueGeneratorCombinator(tvg1, tvg2 webhandle.OldTemplateValueGenerator) webhandle.OldTemplateValueGenerator {
 	return func(ctx *web.Context) onthefly.TemplateValues {
 		tv1 := tvg1(ctx)
 		tv2 := tvg2(ctx)
