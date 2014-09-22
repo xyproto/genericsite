@@ -174,6 +174,14 @@ func ServeSite(basecp BaseCP, userState *permissions.UserState, cps PageCollecti
 	webhandle.Publish("/sitemap_index.xml", "static/various/sitemap_index.xml", false)
 }
 
+// Create a web.go compatible function that returns a string that is the HTML for this page
+func GenerateHTMLwithTemplate(page *onthefly.Page, tvg webhandle.TemplateValueGenerator) func(*web.Context) string {
+	return func(ctx *web.Context) string {
+		values := tvg(ctx)
+		return mustache.Render(page.GetXML(true), values)
+	}
+}
+
 // CSS for the menu, and a bit more
 func GenerateMenuCSS(state *permissions.UserState, stretchBackground bool, cs *ColorScheme) webhandle.SimpleContextHandle {
 	return func(ctx *web.Context) string {
@@ -197,7 +205,7 @@ func GenerateMenuCSS(state *permissions.UserState, stretchBackground bool, cs *C
 // Make an html and css page available
 func (cp *ContentPage) Pub(userState *permissions.UserState, url, cssurl string, cs *ColorScheme, tvg webhandle.TemplateValueGenerator) {
 	genericpage := genericPageBuilder(cp)
-	web.Get(url, webhandle.GenerateHTMLwithTemplate(genericpage, tvg))
+	web.Get(url, GenerateHTMLwithTemplate(genericpage, tvg))
 	web.Get(cp.GeneratedCSSurl, webhandle.GenerateCSS(genericpage))
 	web.Get(cssurl, GenerateMenuCSS(userState, cp.StretchBackground, cs))
 }
