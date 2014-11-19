@@ -5,7 +5,7 @@ import (
 
 	"github.com/hoisie/web"
 	"github.com/xyproto/onthefly"
-	"github.com/xyproto/permissions"
+	"github.com/xyproto/permissions2"
 	"github.com/xyproto/webhandle"
 )
 
@@ -120,7 +120,7 @@ func AddIfNotAdded(url string, filteredMenuEntries *MenuEntries, menuEntry *Menu
 // TODO: Check the user status _once_, and the admin status _once_, then generate the menu
 // TODO: Some way of marking menu entries as user, admin or other rights. Add a group system?
 func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGeneratorFactory {
-	return func(state *permissions.UserState) webhandle.TemplateValueGenerator {
+	return func(state permissions.UserStateKeeper) webhandle.TemplateValueGenerator {
 		return func(ctx *web.Context) onthefly.TemplateValues {
 
 			userRights := state.UserRights(ctx.Request)
