@@ -1,7 +1,5 @@
 package genericsite
 
-// OK, only e-mail related stuff, 23-03-13
-
 import (
 	"net/smtp"
 )

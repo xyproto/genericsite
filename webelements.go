@@ -265,7 +265,3 @@ func AddMenuBox(page *onthefly.Page, darkBackgroundTexture string, customSansSer
 
 	return div, nil
 }
-
-func BackButton() string {
-	return "<button onClick='history.go(-1);'>Back</button>"
-}

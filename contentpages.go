@@ -46,7 +46,7 @@ type (
 	// Content page generator
 	CPgen (func(userState permissions.UserStateKeeper) *ContentPage)
 
-	// A collection of ContentPages
+	// Collection of ContentPages
 	PageCollection []ContentPage
 
 	// Every input from the user must be intitially stored in a UserInput variable, not in a string!
@@ -151,7 +151,7 @@ func genericPageBuilder(cp *ContentPage) *onthefly.Page {
 	return page
 }
 
-// Publish a list of ContentPaages, a colorscheme and template content
+// Publish a list of ContentPages, a colorscheme and template content
 func PublishCPs(userState permissions.UserStateKeeper, pc PageCollection, cs *ColorScheme, tvgf TemplateValueGeneratorFactory, cssurl string) {
 	// For each content page in the page collection
 	for _, cp := range pc {
@@ -210,7 +210,7 @@ func (cp *ContentPage) Pub(userState permissions.UserStateKeeper, url, cssurl st
 	web.Get(cssurl, GenerateMenuCSS(userState, cp.StretchBackground, cs))
 }
 
-// TODO: Write a function for rendering a StandaloneTag inside a Page by the use of template {{{placeholders}}
+// TODO: Write a function for rendering a StandaloneTag inside a Page by the use of template {{{placeholders}}}
 
 // Render a page by inserting data at the {{{placeholders}}} for both html and css
 func RenderPage(page *onthefly.Page, templateContents map[string]string) (string, string) {

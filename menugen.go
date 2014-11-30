@@ -58,7 +58,7 @@ func MenuSnippet(menuEntries MenuEntries) *onthefly.Page {
 		li = ul.AddNewTag("li")
 		li.AddAttrib("class", "menuEntry")
 
-		// TODO: Make sure not duplicate ids are added for two menu entries named "Hi there" and "Hi you"
+		// TODO: Make sure not duplicate ids are added for two menu entries named "Hi there" and "Hi you". Add i to string?
 		menuId := "menu" + menuEntry.id
 		li.AddAttrib("id", menuId)
 
@@ -69,7 +69,7 @@ func MenuSnippet(menuEntries MenuEntries) *onthefly.Page {
 		li.SansSerif()
 		//li.CustomSansSerif("Armata")
 
-		// For every element, but not the first one
+		// For every element, except the first one
 		if i > 0 {
 			// Insert a '|' character in a div
 			sep = li.AddNewTag("div")

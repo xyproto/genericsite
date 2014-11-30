@@ -1,6 +1,7 @@
 package genericsite
 
-// Dismisses various attempts at accessing this site. Honeypot?
+// Dismisses various attempts at accessing this site.
+// Useful for confusing bots? The start of a honeypot?
 
 import (
 	"fmt"
