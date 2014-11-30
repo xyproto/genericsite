@@ -1,37 +1,45 @@
 package genericsite
 
 import (
-	"strings"
-
 	"github.com/hoisie/web"
 	"github.com/xyproto/onthefly"
 	"github.com/xyproto/permissions2"
 	"github.com/xyproto/webhandle"
+	"strconv"
 )
 
-type MenuEntry struct {
-	id   string
-	text string
-	url  string
-}
-
-type MenuEntries []*MenuEntry
-
-// Generate a menu ID based on the first word in the menu text
-func (me *MenuEntry) AutoId() {
-	firstword := me.text
-	if strings.Contains(me.text, " ") {
-		// Get the first word of the menu text
-		firstword = strings.SplitN(me.text, " ", 2)[0]
+type (
+	MenuEntry struct {
+		id   string
+		text string
+		url  string
 	}
-	me.id = firstword
+	MenuEntries []*MenuEntry
+)
+
+var menuIdCounter = 0
+
+// Generate a new menu ID
+func (me *MenuEntry) autoId() string {
+	newId := ""
+
+	// Start with the menu item number and increase the counter
+	newId += strconv.Itoa(menuIdCounter)
+	menuIdCounter++
+
+	// Then add the first letter of the menu text
+	if len(me.text) > 0 {
+		newId += string(me.text[0])
+	}
+
+	return newId
 }
 
 // Takes something like "Admin:/admin" and returns a *MenuEntry
 func NewMenuEntry(text_and_url string) *MenuEntry {
 	var me MenuEntry
 	me.text, me.url = webhandle.HostPortSplit(text_and_url)
-	me.AutoId()
+	me.id = me.autoId()
 	return &me
 }
 
