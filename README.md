@@ -1,23 +1,22 @@
 genericsite
 ===========
 
-* Generic website library with search and user administration.
-* Part of an experiment in procedural generation of websites.
-* Will probably be modified to use templates instead, in the future.
+Deprecated
+----------
 
+I'm phasing out this package.
+
+* Want use [templates](https://github.com/unrolled/render) instead of generating webpages.
+* Want to use the [permissions2](https://github.com/xyproto/permissions2) middleware for users and permissions.
 
 Features and limitations
 ------------------------
 
+* Generic website library with search and user administration.
+* Part of an experiment in procedural generation of websites.
 * Uses procedural generation of html and css extensively.
-* User login and registration system
-* Email confirmation system
-* Admin panel
-* Subpages
-* Native speed
-
-General information
--------------------
-
-* License: MIT
-* Author: Alexander Rødseth
+* Has a user login and registration system.
+* Has an email confirmation system.
+* Has an admin panel.
+* Supports subpages.
+* Runs at native speed.
