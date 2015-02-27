@@ -7,6 +7,7 @@ I'm phasing out this package.
 
 * Want use [templates](https://github.com/unrolled/render) instead of generating webpages.
 * Want to use the [permissions2](https://github.com/xyproto/permissions2) middleware for users and permissions.
+* Do not want to rely on [web.go](https://github.com/hoisie/web), but rather keep the choice open and/or use the standard http package.
 
 Features and limitations
 ------------------------
