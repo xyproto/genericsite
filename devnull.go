@@ -7,11 +7,11 @@ import (
 	"fmt"
 
 	"github.com/hoisie/web"
-	"github.com/xyproto/instapage"
+	"github.com/xyproto/webhandle"
 )
 
 func Hello() string {
-	return instapage.Message("☃", "☃")
+	return webhandle.Message("☃", "☃")
 }
 
 func ParamExample(ctx *web.Context) string {
