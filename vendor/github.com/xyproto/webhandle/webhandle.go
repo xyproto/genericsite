@@ -17,8 +17,8 @@ type HTTPHandler func(http.ResponseWriter, *http.Request)
 
 type (
 	// Various function signatures for handling requests
-	WebHandle              (func(w http.ResponseWriter, r *http.Request, val string) string)
-	SimpleContextHandle    (func(w http.ResponseWriter, r *http.Request) string)
+	WebHandle              func(val string) (w http.ResponseWriter, r *http.Request)
+	SimpleContextHandle    func(w http.ResponseWriter, r *http.Request)
 	TemplateValueGenerator func(w http.ResponseWriter, r *http.Request) TemplateValues
 )
 

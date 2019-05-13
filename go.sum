@@ -120,6 +120,8 @@ github.com/xyproto/simpleredis v0.0.0-20181004131423-f2c3a2cf62d0 h1:fNauyX/GEXR
 github.com/xyproto/simpleredis v0.0.0-20181004131423-f2c3a2cf62d0/go.mod h1:v1Rr7lzv9F8H/sMg5RRvU1oMi9/Fjx6xzhOJgFLnuhs=
 github.com/xyproto/webhandle v0.0.0-20190513101718-702e5d7620cf h1:3KZ+9foOfYUnDam9FtMFEMuajDWOOL/MDmSdxOlx2GE=
 github.com/xyproto/webhandle v0.0.0-20190513101718-702e5d7620cf/go.mod h1:kls0gDFJiuYobUayMVF7Bcf+ABnAPXx/prYHD5Zk4Uc=
+github.com/xyproto/webhandle v0.0.0-20190513103459-e4bb2a8357af h1:n3XTujiU9A5xA9euZgwHpOz80DKAuW1ErW5tp4gvKJc=
+github.com/xyproto/webhandle v0.0.0-20190513103459-e4bb2a8357af/go.mod h1:kls0gDFJiuYobUayMVF7Bcf+ABnAPXx/prYHD5Zk4Uc=
 github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0/go.mod h1:/LWChgwKmvncFJFHJ7Gvn9wZArjbV5/FppcK2fKk/tI=
 github.com/yudai/gojsondiff v1.0.0/go.mod h1:AY32+k2cwILAkW1fbgxQ5mUmMiZFgLIV+FBNExI05xg=
 github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82/go.mod h1:lgjkn3NuSvDfVJdfcVVdX+jpBxNmX4rDAzaS45IcYoM=

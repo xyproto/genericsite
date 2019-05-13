@@ -11,7 +11,6 @@ require (
 	github.com/gin-gonic/gin v1.4.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190430165422-3e4dfb77656c // indirect
 	github.com/gorilla/mux v1.7.1
-	github.com/hoisie/web v0.1.0
 	github.com/iris-contrib/formBinder v0.0.0-20190104093907-fbd5963f41e1 // indirect
 	github.com/juju/errors v0.0.0-20190207033735-e65537c515d7 // indirect
 	github.com/juju/loggo v0.0.0-20190212223446-d976af380377 // indirect
@@ -35,7 +34,7 @@ require (
 	github.com/xyproto/permissions2 v0.0.0-20190219060541-f47b0751729e
 	github.com/xyproto/pinterface v0.0.0-20181004125811-9710ef24b684
 	github.com/xyproto/randomstring v0.0.0-20181222003104-0f764aabc45a // indirect
-	github.com/xyproto/webhandle v0.0.0-20190513101718-702e5d7620cf
+	github.com/xyproto/webhandle v0.0.0-20190513103459-e4bb2a8357af
 	golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529 // indirect
 	golang.org/x/net v0.0.0-20190509222800-a4d6f7feada5 // indirect
 	golang.org/x/sys v0.0.0-20190509141414-a5b02f93d862 // indirect
