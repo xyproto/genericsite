@@ -1,0 +1,24 @@
+# github.com/drbawb/mustache v0.0.0-20130930130810-b035beeed55a
+github.com/drbawb/mustache
+# github.com/gomodule/redigo v2.0.0+incompatible
+github.com/gomodule/redigo/redis
+github.com/gomodule/redigo/internal
+# github.com/gorilla/mux v1.7.1
+github.com/gorilla/mux
+# github.com/hoisie/web v0.1.0
+github.com/hoisie/web
+# github.com/xyproto/cookie v0.0.0-20171003173729-8ce3defb0907
+github.com/xyproto/cookie
+# github.com/xyproto/onthefly v0.0.0-20180903110516-0f923083607c
+github.com/xyproto/onthefly
+# github.com/xyproto/permissions2 v0.0.0-20190219060541-f47b0751729e
+github.com/xyproto/permissions2
+# github.com/xyproto/pinterface v0.0.0-20181004125811-9710ef24b684
+github.com/xyproto/pinterface
+# github.com/xyproto/simpleredis v0.0.0-20181004131423-f2c3a2cf62d0
+github.com/xyproto/simpleredis
+# github.com/xyproto/webhandle v0.0.0-20190513101718-702e5d7620cf
+github.com/xyproto/webhandle
+# golang.org/x/crypto v0.0.0-20181127143415-eb0de9b17e85
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish
