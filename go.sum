@@ -34,8 +34,6 @@ github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e/go.mod h1:wJfORR
 github.com/gopherjs/gopherjs v0.0.0-20190430165422-3e4dfb77656c/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/mux v1.7.1 h1:Dw4jY2nghMMRsh1ol8dv1axHkDwMQK2DHerMNJsIpJU=
 github.com/gorilla/mux v1.7.1/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
-github.com/hoisie/web v0.1.0 h1:oCXxaS9BnWgJZsubx4X+NuOyKPc9y4kB8Eg0jof6SUc=
-github.com/hoisie/web v0.1.0/go.mod h1:9rKIjxNOF05p21HiYMbaQy+ijn3nHaWi2mV3l/KnoIE=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/imkira/go-interpol v1.1.0/go.mod h1:z0h2/2T3XF8kyEPpRgJ3kmNv+C43p+I/CoI+jC3w2iA=
 github.com/iris-contrib/blackfriday v2.0.0+incompatible/go.mod h1:UzZ2bDEoaSGPbkg6SAB4att1aAwTmVIx/5gCVqeyUdI=
@@ -118,10 +116,8 @@ github.com/xyproto/randomstring v0.0.0-20181222003104-0f764aabc45a h1:Nokr4kww8f
 github.com/xyproto/randomstring v0.0.0-20181222003104-0f764aabc45a/go.mod h1:HcK1ojGYWgNJz1Rp9UouvxVGIWsMFAtkftDoHZ6DE9k=
 github.com/xyproto/simpleredis v0.0.0-20181004131423-f2c3a2cf62d0 h1:fNauyX/GEXReX+H51yIISLIEvf0bJOYfhlhncXoNa4o=
 github.com/xyproto/simpleredis v0.0.0-20181004131423-f2c3a2cf62d0/go.mod h1:v1Rr7lzv9F8H/sMg5RRvU1oMi9/Fjx6xzhOJgFLnuhs=
-github.com/xyproto/webhandle v0.0.0-20190513101718-702e5d7620cf h1:3KZ+9foOfYUnDam9FtMFEMuajDWOOL/MDmSdxOlx2GE=
-github.com/xyproto/webhandle v0.0.0-20190513101718-702e5d7620cf/go.mod h1:kls0gDFJiuYobUayMVF7Bcf+ABnAPXx/prYHD5Zk4Uc=
-github.com/xyproto/webhandle v0.0.0-20190513103459-e4bb2a8357af h1:n3XTujiU9A5xA9euZgwHpOz80DKAuW1ErW5tp4gvKJc=
-github.com/xyproto/webhandle v0.0.0-20190513103459-e4bb2a8357af/go.mod h1:kls0gDFJiuYobUayMVF7Bcf+ABnAPXx/prYHD5Zk4Uc=
+github.com/xyproto/webhandle v0.0.0-20190513111725-434fdd6baf02 h1:atPfCMWDS6I6ivx9DYdQMvK+yQukvgRGVrVOGLhXPZY=
+github.com/xyproto/webhandle v0.0.0-20190513111725-434fdd6baf02/go.mod h1:+BK56IgaxcSNm6T2oKTaQAK4cbkpAoPfYWl5QNH1TjI=
 github.com/yalp/jsonpath v0.0.0-20180802001716-5cc68e5049a0/go.mod h1:/LWChgwKmvncFJFHJ7Gvn9wZArjbV5/FppcK2fKk/tI=
 github.com/yudai/gojsondiff v1.0.0/go.mod h1:AY32+k2cwILAkW1fbgxQ5mUmMiZFgLIV+FBNExI05xg=
 github.com/yudai/golcs v0.0.0-20170316035057-ecda9a501e82/go.mod h1:lgjkn3NuSvDfVJdfcVVdX+jpBxNmX4rDAzaS45IcYoM=
