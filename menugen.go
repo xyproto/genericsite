@@ -1,10 +1,10 @@
 package genericsite
 
 import (
-	"github.com/hoisie/web"
 	"github.com/xyproto/onthefly"
 	"github.com/xyproto/pinterface"
 	"github.com/xyproto/webhandle"
+	"net/http"
 	"strconv"
 )
 
@@ -129,10 +129,10 @@ func AddIfNotAdded(url string, filteredMenuEntries *MenuEntries, menuEntry *Menu
 // TODO: Some way of marking menu entries as user, admin or other rights. Add a group system?
 func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGeneratorFactory {
 	return func(state pinterface.IUserState) webhandle.TemplateValueGenerator {
-		return func(ctx *web.Context) onthefly.TemplateValues {
+		return func(w http.ResponseWriter, req *http.Request) onthefly.TemplateValues {
 
-			userRights := state.UserRights(ctx.Request)
-			adminRights := state.AdminRights(ctx.Request)
+			userRights := state.UserRights(req)
+			adminRights := state.AdminRights(req)
 
 			var filteredMenuEntries MenuEntries
 			var logoutEntry *MenuEntry = nil
@@ -202,9 +202,9 @@ func DynamicMenuFactoryGenerator(menuEntries MenuEntries) TemplateValueGenerator
 
 // Combines two TemplateValueGenerators into one TemplateValueGenerator by adding the strings per key
 func TemplateValueGeneratorCombinator(tvg1, tvg2 webhandle.TemplateValueGenerator) webhandle.TemplateValueGenerator {
-	return func(ctx *web.Context) onthefly.TemplateValues {
-		tv1 := tvg1(ctx)
-		tv2 := tvg2(ctx)
+	return func(w http.ResponseWriter, req *http.Request) onthefly.TemplateValues {
+		tv1 := tvg1(w, req)
+		tv2 := tvg2(w, req)
 		for key, value := range tv2 {
 			// TODO: Check if key exists in tv1 first
 			tv1[key] += value

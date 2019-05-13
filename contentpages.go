@@ -1,10 +1,13 @@
 package genericsite
 
 import (
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/drbawb/mustache"
-	"github.com/hoisie/web"
+	"github.com/gorilla/mux"
+	//"github.com/urfave/negroni"
 	"github.com/xyproto/onthefly"
 	"github.com/xyproto/permissions2"
 	"github.com/xyproto/pinterface"
@@ -153,40 +156,40 @@ func genericPageBuilder(cp *ContentPage) *onthefly.Page {
 }
 
 // Publish a list of ContentPages, a colorscheme and template content
-func PublishCPs(userState pinterface.IUserState, pc PageCollection, cs *ColorScheme, tvgf TemplateValueGeneratorFactory, cssurl string) {
+func PublishCPs(r *mux.Router, userState pinterface.IUserState, pc PageCollection, cs *ColorScheme, tvgf TemplateValueGeneratorFactory, cssurl string) {
 	// For each content page in the page collection
 	for _, cp := range pc {
 		// TODO: different css urls for all of these?
-		cp.Pub(userState, cp.Url, cssurl, cs, tvgf(userState))
+		cp.Pub(r, userState, cp.Url, cssurl, cs, tvgf(userState))
 	}
 }
 
 // Some Engines like Admin must be served separately
 // jquerypath is ie "/js/jquery.2.0.0.js", will then serve the file at static/js/jquery.2.0.0.js
-func ServeSite(basecp BaseCP, userState pinterface.IUserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jquerypath string) {
+func ServeSite(r *mux.Router, basecp BaseCP, userState pinterface.IUserState, cps PageCollection, tvgf TemplateValueGeneratorFactory, jquerypath string) {
 	cs := basecp(userState).ColorScheme
-	PublishCPs(userState, cps, cs, tvgf, "/css/menu.css")
+	PublishCPs(r, userState, cps, cs, tvgf, "/css/menu.css")
 
 	// TODO: Add fallback to this local version
-	webhandle.Publish(jquerypath, "static"+jquerypath, true)
+	webhandle.Publish(r, jquerypath, "static"+jquerypath)
 
 	// TODO: Generate these
-	webhandle.Publish("/robots.txt", "static/various/robots.txt", false)
-	webhandle.Publish("/sitemap_index.xml", "static/various/sitemap_index.xml", false)
+	webhandle.Publish(r, "/robots.txt", "static/various/robots.txt")
+	webhandle.Publish(r, "/sitemap_index.xml", "static/various/sitemap_index.xml")
 }
 
 // Create a web.go compatible function that returns a string that is the HTML for this page
-func GenerateHTMLwithTemplate(page *onthefly.Page, tvg webhandle.TemplateValueGenerator) func(*web.Context) string {
-	return func(ctx *web.Context) string {
-		values := tvg(ctx)
-		return mustache.Render(page.GetXML(true), values)
+func GenerateHTMLwithTemplate(page *onthefly.Page, tvg webhandle.TemplateValueGenerator) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
+		values := tvg(w, req)
+		fmt.Fprintf(w, "%s", mustache.Render(page.GetXML(true), values))
 	}
 }
 
 // CSS for the menu, and a bit more
-func GenerateMenuCSS(state pinterface.IUserState, stretchBackground bool, cs *ColorScheme) webhandle.SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		ctx.ContentType("css")
+func GenerateMenuCSS(state pinterface.IUserState, stretchBackground bool, cs *ColorScheme) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Content-Type", "text/css")
 
 		// one of the extra css files that are loaded after the main style
 		retval := mustache.Render(menustyle_tmpl, cs)
@@ -199,16 +202,17 @@ func GenerateMenuCSS(state pinterface.IUserState, stretchBackground bool, cs *Co
 			retval = "body {\nbackground-color: " + cs.Default_background + ";\n}\n" + retval
 		}
 		retval += ".titletext { display: inline; }"
-		return retval
+
+		fmt.Fprintf(w, "%s", retval)
 	}
 }
 
 // Make an html and css page available
-func (cp *ContentPage) Pub(userState pinterface.IUserState, url, cssurl string, cs *ColorScheme, tvg webhandle.TemplateValueGenerator) {
+func (cp *ContentPage) Pub(r *mux.Router, userState pinterface.IUserState, url, cssurl string, cs *ColorScheme, tvg webhandle.TemplateValueGenerator) {
 	genericpage := genericPageBuilder(cp)
-	web.Get(url, GenerateHTMLwithTemplate(genericpage, tvg))
-	web.Get(cp.GeneratedCSSurl, webhandle.GenerateCSS(genericpage))
-	web.Get(cssurl, GenerateMenuCSS(userState, cp.StretchBackground, cs))
+	r.HandleFunc(url, GenerateHTMLwithTemplate(genericpage, tvg))
+	r.HandleFunc(cp.GeneratedCSSurl, webhandle.GenerateCSS(genericpage))
+	r.HandleFunc(cssurl, GenerateMenuCSS(userState, cp.StretchBackground, cs))
 }
 
 // TODO: Write a function for rendering a StandaloneTag inside a Page by the use of template {{{placeholders}}}
@@ -227,20 +231,26 @@ func (cp *ContentPage) Surround(s string, templateContents map[string]string) (s
 }
 
 // Uses a given WebHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapWebHandle(wh webhandle.WebHandle, tvg webhandle.TemplateValueGenerator) webhandle.WebHandle {
-	return func(ctx *web.Context, val string) string {
-		html, css := cp.Surround(wh(ctx, val), tvg(ctx))
-		web.Get(cp.GeneratedCSSurl, css)
-		return html
+func (cp *ContentPage) WrapWebHandle(r *mux.Router, wh func(string) string, tvg webhandle.TemplateValueGenerator) func(string, http.ResponseWriter, *http.Request) {
+	return func(val string, w http.ResponseWriter, req *http.Request) {
+		html, css := cp.Surround(wh(val), tvg(w, req))
+		r.HandleFunc(cp.GeneratedCSSurl, func(w http.ResponseWriter, req *http.Request) {
+			w.Header().Add("Content-Type", "text/css")
+			fmt.Fprintf(w, "%s", css)
+		})
+		fmt.Fprintf(w, "%s", html)
 	}
 }
 
 // Uses a given SimpleContextHandle as the contents for the the ContentPage contents
-func (cp *ContentPage) WrapSimpleContextHandle(sch webhandle.SimpleContextHandle, tvg webhandle.TemplateValueGenerator) webhandle.SimpleContextHandle {
-	return func(ctx *web.Context) string {
-		html, css := cp.Surround(sch(ctx), tvg(ctx))
-		web.Get(cp.GeneratedCSSurl, css)
-		return html
+func (cp *ContentPage) WrapSimpleContextHandle(r *mux.Router, sch func(w http.ResponseWriter, req *http.Request) string, tvg webhandle.TemplateValueGenerator) func(w http.ResponseWriter, req *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
+		html, css := cp.Surround(sch(w, req), tvg(w, req))
+		r.HandleFunc(cp.GeneratedCSSurl, func(w http.ResponseWriter, req *http.Request) {
+			w.Header().Add("Content-Type", "text/css")
+			fmt.Fprintf(w, "%s", css)
+		})
+		fmt.Fprintf(w, "%s", html)
 	}
 }
 
