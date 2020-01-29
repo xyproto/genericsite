@@ -1,4 +1,4 @@
-#genericsite [![Build Status](https://travis-ci.org/xyproto/genericsite.svg?branch=master)](https://travis-ci.org/xyproto/genericsite) [![GoDoc](https://godoc.org/github.com/xyproto/genericsite?status.svg)](http://godoc.org/github.com/xyproto/genericsite)
+# genericsite [![Build Status](https://travis-ci.com/xyproto/genericsite.svg?branch=master)](https://travis-ci.com/xyproto/genericsite) [![GoDoc](https://godoc.org/github.com/xyproto/genericsite?status.svg)](http://godoc.org/github.com/xyproto/genericsite)
 
 Deprecated!
 -----------
