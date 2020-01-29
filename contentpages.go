@@ -7,7 +7,6 @@ import (
 
 	"github.com/drbawb/mustache"
 	"github.com/gorilla/mux"
-	//"github.com/urfave/negroni"
 	"github.com/xyproto/onthefly"
 	"github.com/xyproto/permissions2"
 	"github.com/xyproto/pinterface"
